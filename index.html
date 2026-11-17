@@ -1,0 +1,1160 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<title>Rituals · O Teu Mapa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@300;400;500&display=swap">
+<style>
+/* Layout: uma coluna para o telemóvel; o cartão em cima, depois as camadas do mapa como cartões que mostram só a linha da pessoa. */
+:root {
+  --bg: #F5EDE4;
+  --papel: #fffaf5;
+  --fg: #1f1418;
+  --texto: #4a3040;
+  --suave: #8a6474;
+  --linha: #e6d6c9;
+  --bordo: #5c2434;
+  --bordo-claro: #7a3048;
+  --bordo-suave: rgba(92,36,52,0.07);
+  --sobre-bordo: #F5EDE4;
+  --ouro: #b07a4a;
+  --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --sans: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1316; --papel: #261a1f; --fg: #f4e9df; --texto: #dccbc0; --suave: #ab9187; --linha: #3c2b31;
+    --bordo: #d99aaa; --bordo-claro: #e6b3bf; --bordo-suave: rgba(217,154,170,0.10); --sobre-bordo: #1c1316; --ouro: #d9a877;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1c1316; --papel: #261a1f; --fg: #f4e9df; --texto: #dccbc0; --suave: #ab9187; --linha: #3c2b31;
+  --bordo: #d99aaa; --bordo-claro: #e6b3bf; --bordo-suave: rgba(217,154,170,0.10); --sobre-bordo: #1c1316; --ouro: #d9a877;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--sans); font-weight: 300; font-size: 16px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 72px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bordo); }
+.wrap { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 64px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 500; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+strong { font-weight: 500; color: var(--fg); }
+a { color: var(--bordo); }
+:focus-visible { outline: 2px solid var(--bordo); outline-offset: 3px; }
+
+/* Barra fixa com as secções */
+.barra {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  background: var(--bordo); color: var(--sobre-bordo);
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.barra nav { max-width: 680px; margin: 0 auto; display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
+.barra nav::-webkit-scrollbar { display: none; }
+.barra a { color: var(--sobre-bordo); text-decoration: none; font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase; opacity: .8; padding: 4px 0; }
+.barra a:hover { opacity: 1; }
+
+/* Topo */
+.topo { padding-top: 56px; display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--suave); }
+.topo h1 { font-size: clamp(56px, 16vw, 92px); font-style: italic; font-weight: 400; color: var(--bordo); line-height: .95; }
+.topo .sub { font-family: var(--serif); font-size: clamp(22px, 5vw, 28px); font-style: italic; color: var(--texto); line-height: 1.3; }
+.piloto { font-size: 13px; color: var(--suave); border-top: 1px solid var(--linha); padding-top: 12px; }
+
+section { display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 64px; }
+.sec-titulo { font-size: clamp(32px, 7vw, 42px); font-style: italic; font-weight: 400; color: var(--bordo); line-height: 1.1; }
+.texto { color: var(--texto); }
+.assin { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--bordo); }
+
+/* Áudio */
+.audios { display: flex; flex-direction: column; gap: 10px; }
+.audio { display: grid; grid-template-columns: 48px 1fr; gap: 14px; align-items: center; background: var(--papel); border: 1px solid var(--linha); padding: 14px 16px; }
+.audio button.play {
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--bordo); background: transparent; color: var(--bordo);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+}
+.audio button.play[data-estado="a-tocar"] { background: var(--bordo); color: var(--sobre-bordo); }
+.audio button.play svg { width: 18px; height: 18px; fill: currentColor; }
+.audio-info { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.audio-nome { font-family: var(--serif); font-size: 20px; font-weight: 500; line-height: 1.2; color: var(--fg); }
+.audio-desc { font-size: 14px; color: var(--texto); line-height: 1.55; }
+.progresso { height: 3px; background: var(--linha); position: relative; overflow: hidden; }
+.progresso span { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--bordo); }
+.audio-tempo { font-size: 12px; color: var(--suave); font-variant-numeric: tabular-nums; }
+.audio-fora { font-size: 12px; color: var(--suave); }
+
+/* Como usar */
+details.dobra { border-top: 1px solid var(--linha); border-bottom: 1px solid var(--linha); }
+details.dobra summary { cursor: pointer; list-style: none; padding: 16px 0; display: flex; justify-content: space-between; gap: 12px; font-family: var(--serif); font-size: 22px; font-weight: 500; }
+details.dobra summary::-webkit-details-marker { display: none; }
+details.dobra summary::after { content: '+'; font-family: var(--sans); font-weight: 300; color: var(--bordo); font-size: 22px; line-height: 1; transition: transform .2s ease; }
+details.dobra[open] summary::after { transform: rotate(45deg); }
+.dobra-corpo { display: flex; flex-direction: column; gap: 14px; padding-bottom: 20px; color: var(--texto); }
+.dobra-corpo h4 { margin: 6px 0 0; font-family: var(--serif); font-size: 20px; font-weight: 500; color: var(--fg); }
+.dobra-corpo ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Cartão */
+.cartao { background: var(--papel); border: 1px solid var(--bordo); padding: 24px 20px; display: flex; flex-direction: column; gap: 18px; }
+.cartao-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 10px; }
+.cartao-topo h3 { font-size: 26px; font-style: italic; font-weight: 400; color: var(--bordo); }
+.pessoas { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pessoas select, .campo select, .campo input {
+  font-family: var(--sans); font-size: 15px; font-weight: 400; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--linha); padding: 11px 12px; width: 100%; border-radius: 0; min-width: 0;
+}
+.pessoas select { width: auto; max-width: 100%; }
+.btn-txt { font-family: var(--sans); font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 500; background: none; border: none; color: var(--bordo); cursor: pointer; padding: 8px 2px; }
+.grupo { display: flex; flex-direction: column; gap: 12px; }
+.grupo-tit { font-size: 11px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--suave); border-bottom: 1px solid var(--linha); padding-bottom: 6px; }
+.campos { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .campos { grid-template-columns: 1fr 1fr; } }
+.campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.campo label { font-size: 13px; font-weight: 400; color: var(--fg); }
+.campo small { font-size: 12px; color: var(--suave); line-height: 1.4; }
+.centros { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 560px) { .centros { grid-template-columns: 1fr 1fr; } }
+.centro { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--linha); }
+.centro span { font-size: 14px; color: var(--fg); }
+.seg { display: inline-flex; border: 1px solid var(--bordo); flex-shrink: 0; }
+.seg button { font-family: var(--sans); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 7px 10px; border: none; background: transparent; color: var(--bordo); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--bordo); }
+.seg button[aria-pressed="true"] { background: var(--bordo); color: var(--sobre-bordo); }
+/* Momentos do dia nos gestos */
+.aplic-txt { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.momentos { display: flex; flex-wrap: wrap; gap: 6px; }
+.momentos button { font-family: var(--sans); font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 10px; border: 1px solid var(--linha); background: transparent; color: var(--suave); cursor: pointer; border-radius: 999px; }
+.momentos button:hover { border-color: var(--bordo); color: var(--bordo); }
+.momentos button[aria-pressed="true"] { background: var(--bordo); border-color: var(--bordo); color: var(--sobre-bordo); }
+.dica-rotina { font-size: 14px; color: var(--texto); background: var(--papel); border: 1px solid var(--linha); padding: 12px 14px; }
+/* A minha rotina */
+.rotina { display: flex; flex-direction: column; gap: 14px; }
+.momento { background: var(--papel); border: 1px solid var(--linha); padding: 18px 18px 8px; display: flex; flex-direction: column; gap: 4px; }
+.momento h3 { font-size: 26px; font-style: italic; font-weight: 400; color: var(--bordo); }
+.momento .hora { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--suave); }
+.gesto { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; padding: 12px 0; border-top: 1px solid var(--linha); }
+.gesto p { color: var(--fg); line-height: 1.5; }
+.gesto small { display: block; margin-top: 3px; font-size: 12px; color: var(--suave); letter-spacing: .3px; }
+.gesto button { background: none; border: none; color: var(--suave); cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px; }
+.gesto button:hover { color: var(--bordo); }
+.momento .vazio-m { font-size: 14px; color: var(--suave); font-style: italic; padding: 8px 0 12px; }
+/* Os meus rituais em PDF */
+.pdf-bloco { background: var(--bordo); color: var(--sobre-bordo); padding: 26px 22px; display: flex; flex-direction: column; gap: 12px; }
+.pdf-bloco h3 { font-size: 28px; font-style: italic; font-weight: 400; }
+.pdf-bloco p { font-size: 15px; opacity: .9; }
+.pdf-bloco button { align-self: flex-start; font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 16px 22px; border: none; background: var(--sobre-bordo); color: var(--bordo); cursor: pointer; }
+.pdf-bloco button:disabled { opacity: .5; cursor: default; }
+.pdf-estado { font-size: 14px; min-height: 1.4em; }
+.grupo-mapa { margin-top: 40px; font-family: var(--serif); font-size: 26px; font-style: italic; color: var(--bordo); border-bottom: 2px solid var(--bordo); padding-bottom: 6px; }
+.grupo-mapa:first-child { margin-top: 8px; }
+.em-breve { padding-top: 22px; border-top: 1px solid var(--linha); display: flex; flex-direction: column; gap: 2px; }
+.em-breve h3 { font-size: 24px; color: var(--suave); }
+.em-breve p { font-size: 13px; color: var(--suave); font-style: italic; }
+.opcoes { display: grid; grid-template-columns: 1fr; gap: 8px; }
+@media (min-width: 560px) { .opcoes { grid-template-columns: 1fr 1fr; } }
+.opcao { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--fg); padding: 10px 12px; border: 1px solid var(--linha); background: var(--bg); cursor: pointer; }
+.opcao input { width: auto; margin-top: 4px; }
+.mini-cartoes { display: flex; flex-direction: column; gap: 12px; }
+.mini { border: 1px solid var(--linha); background: var(--bg); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.mini-topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.mini-topo b { font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--bordo); }
+.mini-centros { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.mini-centros label { font-size: 13px; display: flex; gap: 6px; align-items: center; color: var(--fg); }
+.mini-centros input { width: auto; }
+.pessoa-tit { font-family: var(--serif); font-size: 28px; font-style: italic; color: var(--bordo); margin-top: 24px; }
+.lua-hoje { display: inline-block; margin-left: 8px; font-family: var(--sans); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; background: var(--bordo); color: var(--sobre-bordo); padding: 3px 8px; vertical-align: middle; }
+details.mais-fundo { border: 1px dashed var(--bordo); padding: 0 16px; background: var(--bordo-suave); }
+details.mais-fundo > summary { cursor: pointer; list-style: none; padding: 16px 0; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+details.mais-fundo > summary::-webkit-details-marker { display: none; }
+details.mais-fundo > summary .t { font-family: var(--serif); font-size: 22px; font-style: italic; color: var(--bordo); }
+details.mais-fundo > summary .s { display: block; font-size: 12px; color: var(--suave); margin-top: 2px; }
+details.mais-fundo > summary::after { content: '+'; color: var(--bordo); font-size: 22px; line-height: 1; transition: transform .2s ease; }
+details.mais-fundo[open] > summary::after { transform: rotate(45deg); }
+.mais-fundo-corpo { display: flex; flex-direction: column; gap: 18px; padding-bottom: 18px; }
+.conta-gestos { display: block; margin-top: 6px; font-size: 12px; letter-spacing: 1px; color: var(--suave); font-variant-numeric: tabular-nums; }
+.pdf-bloco .conta-gestos { color: var(--sobre-bordo); opacity: .8; }
+.a-chegar { text-align: center; font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--suave); }
+.passo-um { background: var(--bordo-suave); border-left: 3px solid var(--bordo); padding: 18px 18px; display: flex; flex-direction: column; gap: 10px; color: var(--texto); }
+.passo-um .forte { font-family: var(--serif); font-size: 22px; line-height: 1.3; color: var(--fg); }
+.passo-um ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.passo-um small { font-size: 13px; color: var(--suave); }
+.guardado { font-size: 13px; color: var(--suave); min-height: 1.4em; }
+
+/* Mapa */
+.intro-mapa { color: var(--texto); }
+.vazio { background: var(--bordo-suave); border: 1px dashed var(--bordo); padding: 18px; color: var(--texto); font-size: 15px; }
+.camada { display: flex; flex-direction: column; gap: 12px; padding-top: 28px; border-top: 1px solid var(--linha); }
+.camada-cab { display: flex; flex-direction: column; gap: 2px; }
+.camada-cab h3 { font-size: 28px; line-height: 1.15; }
+.camada-cab p { font-size: 14px; color: var(--suave); font-style: italic; }
+.linha-tua { background: var(--papel); border: 1px solid var(--linha); border-left: 3px solid var(--bordo); padding: 18px 18px 6px; display: flex; flex-direction: column; gap: 10px; }
+.dado { font-size: 11px; letter-spacing: 2.2px; text-transform: uppercase; color: var(--bordo); font-weight: 500; }
+.significado { font-family: var(--serif); font-size: 22px; line-height: 1.3; color: var(--fg); }
+.aplic { display: grid; grid-template-columns: 82px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--linha); font-size: 15px; line-height: 1.6; color: var(--texto); }
+.aplic b { font-size: 10.5px; letter-spacing: 1.8px; text-transform: uppercase; font-weight: 500; color: var(--suave); padding-top: 3px; }
+.falta { font-size: 14px; color: var(--suave); font-style: italic; }
+details.outras summary { cursor: pointer; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--bordo); padding: 6px 0; }
+details.outras .lista-outras { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+details.outras .o { font-size: 14px; color: var(--texto); line-height: 1.55; padding: 8px 0; border-top: 1px solid var(--linha); }
+details.outras .o strong { display: block; font-size: 13px; }
+.centros-tua { display: flex; flex-direction: column; gap: 10px; }
+
+.rodape { font-size: 12px; color: var(--suave); text-align: center; letter-spacing: 1.5px; text-transform: uppercase; line-height: 2; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+
+<div class="barra">
+  <nav aria-label="Secções">
+    <a href="#boas-vindas">Boas-vindas</a>
+    <a href="#cartao">O teu cartão</a>
+    <a href="#mapa">O teu mapa</a>
+    <a href="#criancas" id="nav-criancas" hidden>Crianças</a>
+    <a href="#recem-nascidos" id="nav-bebes" hidden>Recém-nascidos</a>
+    <a href="#ciclos" id="nav-ciclos" hidden>Ciclos</a>
+    <a href="#rotina">Os meus rituais</a>
+    <a href="#ferramentas">Ferramentas</a>
+    <a href="#e-agora">E agora?</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <header class="topo">
+    <div class="eyebrow">Embodiement by Design · Rita Silva Soares</div>
+    <h1>Rituals</h1>
+    <p class="sub">O teu manual de instruções, feito a partir do teu mapa único.</p>
+  </header>
+
+  <!-- BOAS-VINDAS -->
+  <section id="boas-vindas">
+    <h2 class="sec-titulo">Boas-vindas</h2>
+    <p class="texto">Olá, sou a Rita. Há mais de meia década que junto a neurociência, o Human Design, a sistémica e a comunicação não-violenta numa só linguagem: a forma como me leio, como decido, e como ajudo outras mulheres a viver a partir do que são.</p>
+    <p class="texto">O Rituals é isso, tornado teu. Não é um curso nem mais informação. É o teu guia prático, feito a partir do teu mapa único, para levares o que descobres ao corpo, à família e à marca. O manual que todas gostaríamos de ter recebido desde o dia zero.</p>
+    <p class="texto">A minha sugestão é simples: vai devagar, uma camada de cada vez, e deixa o corpo ir integrando. Não é para despachar. É para viveres.</p>
+    <p class="texto">Que redescubras quem és, e que vivas como tal.</p>
+    <p class="assin">Um xiii, Rita</p>
+    <div class="audios" data-grupo="boas-vindas"></div>
+    <p class="dica-rotina" style="font-style:italic">O Rituals foi escrito no feminino, na minha voz de sempre. É para todas as pessoas: mulheres, homens, casais e famílias. Se for o teu caso, lê no masculino.</p>
+
+    <details class="dobra">
+      <summary>Como usar o teu Rituals</summary>
+      <div class="dobra-corpo">
+        <p>O teu Rituals lê-se assim: primeiro preenches o teu Cartão Único. Depois, em cada tabela, sublinhas a linha que é tua e lês ao lado o que ela te diz para o corpo, a família e a marca. Em segundos sabes o gesto certo para ti.</p>
+        <p><strong>Aqui, o guia sublinha por ti:</strong> escolhes os teus dados no cartão e cada camada mostra-te só a tua linha.</p>
+        <h4>A hora certa</h4>
+        <p>A hora exata de nascimento é essencial. Se não a souberes de cor, pergunta a alguém da família ou pede o registo na conservatória. Faz mesmo diferença, sobretudo em detalhes como o tipo de ambiente e o sentido mais forte.</p>
+        <p>Conto-te a minha história: durante anos pensei que tinha nascido às oito e oito da manhã. Quando fui ao registo, descobri que era às nove e cinquenta. Foi de mudar a cabeça, alterou detalhes importantes do meu mapa.</p>
+        <p>Mas que isto não te impeça de avançar. Se só souberes a hora aproximada, faz já com a aproximada: os pontos principais, esses, normalmente não mudam. Se não fizeres ideia, coloca meio-dia. E, se quiseres ver com os teus olhos, experimenta a hora aproximada, o meio-dia, e um horário de manhã e outro à noite, e repara só na diferença dos dados.</p>
+        <h4>O ritmo</h4>
+        <p>Não tens de fazer tudo de uma vez. Vai devagar, uma camada de cada vez, ao teu ritmo. Isto não é para despachar. É para viveres.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- CARTÃO -->
+  <section id="cartao">
+    <h2 class="sec-titulo">O teu Cartão Único</h2>
+    <div class="passo-um">
+      <p class="forte">Primeiro geras o teu mapa num destes sítios. Depois escolhes aqui o que lá encontras.</p>
+      <ul>
+        <li><a href="https://www.jovianarchive.com" target="_blank" rel="noopener">Jovian Archive</a> (a oficial, gratuita, com o gráfico completo)</li>
+        <li><a href="https://www.myhumandesign.com" target="_blank" rel="noopener">My Human Design, de Jenna Zoe</a> (a linguagem deste guia: Caves, Valleys, os sentidos)</li>
+        <li><a href="https://bodygraph.io" target="_blank" rel="noopener">bodygraph.io</a> (gratuita e detalhada, com as setas e o tom de cada variável)</li>
+      </ul>
+      <small>Escolhe um que mostre as quatro setas à volta da cabeça: é aí que estão o tipo de ambiente e o sentido mais forte, que muitas plataformas não mostram. A hora exata de nascimento importa: vê “A hora certa” em Como usar o teu Rituals.</small>
+    </div>
+    <p class="texto">Preenche o cartão com o que descobres. É a tua chave: é por ele que sabes quais são as tuas linhas em cada tabela. Um por pessoa.</p>
+
+    <div class="cartao">
+      <div class="cartao-topo">
+        <h3>O Meu Mapa</h3>
+        <div class="pessoas">
+          <label for="pessoa" class="eyebrow" style="letter-spacing:2px">Cartão de</label>
+          <select id="pessoa"></select>
+          <button type="button" class="btn-txt" id="nova-pessoa">+ Novo cartão</button>
+        </div>
+      </div>
+
+      <div class="campo"><label for="c-nome">De quem é este cartão</label><input id="c-nome" type="text" autocomplete="off" placeholder="O teu nome"></div>
+
+      <div class="grupo">
+        <div class="grupo-tit">Mapa Base</div>
+        <div class="campos">
+          <div class="campo"><label for="c-tipo">Tipo de energia</label><select id="c-tipo"></select><small>Geradora, Geradora Manifestante, Manifestadora, Projetora ou Refletora. A estratégia, a assinatura e o tema seguem o tipo.</small></div>
+          <div class="campo"><label for="c-autoridade">Autoridade</label><select id="c-autoridade"></select><small>emocional, sacral, esplénica, do ego, autoprojetada, mental ou lunar</small></div>
+          <div class="campo"><label for="c-perfil">Perfil</label><select id="c-perfil"></select><small>ex: 2/4, 1/3, 5/1</small></div>
+        </div>
+      </div>
+
+      <details class="mais-fundo" id="mais-fundo">
+        <summary><span><span class="t">Quando quiseres ir mais fundo</span><span class="s">as tuas emoções, como digeres, o lugar que te faz bem e o sentido que te guia</span></span></summary>
+        <div class="mais-fundo-corpo">
+      <p class="texto" style="font-style:italic">Não precisas disto para começar. O mapa base já te dá o teu dia. Volta aqui quando o corpo pedir mais.</p>
+      <div class="grupo">
+        <div class="grupo-tit">Emoções</div>
+        <div class="campos">
+          <div class="campo"><label for="c-emocional">Tipo emocional</label><select id="c-emocional"></select><small>emocional ou não-emocional</small></div>
+        </div>
+      </div>
+
+      <div class="grupo">
+        <div class="grupo-tit">Centros definidos e indefinidos</div>
+        <small style="color:var(--suave);font-size:13px">os 9 centros: quais a cores (definido), quais em branco (aberto)</small>
+        <div class="centros" id="c-centros"></div>
+      </div>
+
+      <div class="grupo">
+        <div class="grupo-tit">Perfil de Vitalidade e Manifestação</div>
+        <p class="dica-rotina" style="font-style:italic">As setas são dos detalhes mais finos do teu mapa e dependem muito da hora exata de nascimento. Se a tua hora for aproximada, lê estas camadas com leveza: experimenta, e repara no que o teu corpo reconhece.</p>
+        <div class="campos">
+          <div class="campo"><label for="c-digestao">Tipo de digestão</label><select id="c-digestao"></select></div>
+          <div class="campo"><label for="c-rotina">Rotina e cérebro</label><select id="c-rotina"></select><small>a primeira seta, em cima do lado esquerdo: está virada para a esquerda ou para a direita?</small></div>
+          <div class="campo"><label for="c-manif1">Manifestação · a forma de pedir</label><select id="c-manif1"></select><small>a seta de baixo, do lado esquerdo: está virada para a esquerda ou para a direita?</small></div>
+          <div class="campo"><label for="c-manif2">Manifestação · o teu papel</label><select id="c-manif2"></select><small>a seta de baixo, do lado direito: está virada para a esquerda ou para a direita?</small></div>
+          <div class="campo"><label for="c-ambiente">Tipo de ambiente</label><select id="c-ambiente"></select><small>Caves, Markets, Kitchens, Mountains, Valleys ou Shores</small></div>
+          <div class="campo"><label for="c-sentido">Sentido mais forte</label><select id="c-sentido"></select><small>olfato, paladar, visão externa, visão interna, sentir ou tato</small></div>
+          <div class="campo"><label for="c-canais" style="display:flex;gap:10px;align-items:flex-start;font-weight:400"><input id="c-canais" type="checkbox" style="width:auto;margin-top:5px"> Tenho colorido algum dos canais entre o Baço e a Raiz</label><small>O exercício físico segue o teu tipo e o teu centro Raiz, que já marcaste em cima.</small></div>
+        </div>
+      </div>
+
+        </div>
+      </details>
+
+      <div class="grupo">
+        <div class="grupo-tit">O que queres no teu guia</div>
+        <div class="opcoes">
+          <label class="opcao" for="o-filhos"><input id="o-filhos" type="checkbox"> O Mapa das tuas Crianças</label>
+          <label class="opcao" for="o-bebes"><input id="o-bebes" type="checkbox"> O Mapa dos Recém-nascidos</label>
+          <label class="opcao" for="o-lua"><input id="o-lua" type="checkbox"> Os Ciclos Lunares</label>
+          <label class="opcao" for="o-menstrual"><input id="o-menstrual" type="checkbox"> O Ciclo Menstrual</label>
+        </div>
+      </div>
+
+      <div class="grupo" id="g-filhos" hidden>
+        <div class="grupo-tit">Cartão da Criança · um por filho</div>
+        <div class="mini-cartoes" id="lista-filhos"></div>
+        <button type="button" class="btn-txt" id="novo-filho" style="align-self:flex-start">+ Juntar um filho</button>
+      </div>
+
+      <div class="grupo" id="g-bebes" hidden>
+        <div class="grupo-tit">Cartão do Recém-nascido · um por bebé</div>
+        <div class="mini-cartoes" id="lista-bebes"></div>
+        <button type="button" class="btn-txt" id="novo-bebe" style="align-self:flex-start">+ Juntar um bebé</button>
+      </div>
+
+      <p class="guardado" id="guardado" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- MAPA ENERGÉTICO -->
+  <section id="mapa">
+    <h2 class="sec-titulo">O teu mapa</h2>
+    <p class="intro-mapa">Quem és e como a tua energia funciona. Em cada camada, a tua linha aparece sozinha, com o que te diz para o corpo, a família e a marca.</p>
+    <p class="dica-rotina">Por baixo de cada gesto, toca em <strong>Escolho este gesto</strong>. Ele fica marcado e entra no teu PDF, em <a href="#rotina">Os meus rituais</a>, arrumado no corpo, no projeto família ou na marca.<br><em>Para começar, chegam três gestos: um para o corpo, um para a família e um para a marca. Vive-os este mês. Quando já te souberem a casa, escolhe mais.</em><span class="conta-gestos"></span></p>
+    <div id="mapa-corpo"></div>
+  </section>
+
+  <!-- O MAPA DAS TUAS CRIANÇAS -->
+  <section id="criancas" hidden>
+    <h2 class="sec-titulo">O Mapa das tuas Crianças</h2>
+    <p class="texto">Como acompanhar cada filho pelo desenho dele. Tom gentil e atento, sem prescrições rígidas. Em sintonia com a Jenna Zoe e a Ana Costa Soares.</p>
+    <div id="criancas-corpo"></div>
+  </section>
+
+  <!-- O MAPA DOS RECÉM-NASCIDOS -->
+  <section id="recem-nascidos" hidden>
+    <h2 class="sec-titulo">O Mapa dos Recém-nascidos</h2>
+    <p class="texto">Num bebé ainda não se observa o tipo em ação, mas já se lê no gráfico o que ele absorve (os centros abertos) e já se cuida do sono. Tom gentil, sem médias nem horários rígidos.</p>
+    <div id="bebes-corpo"></div>
+  </section>
+
+  <!-- OS TEUS CICLOS -->
+  <section id="ciclos" hidden>
+    <h2 class="sec-titulo">Os teus Ciclos</h2>
+    <p class="texto">A lua fala a todas; a menstruação a quem menstrua. Cada fase é um modo de ser legítimo, não uma fase boa ou má.</p>
+    <div id="ciclos-corpo"></div>
+  </section>
+
+  <!-- A MINHA ROTINA -->
+  <section id="rotina">
+    <div class="rotina" id="rotina-corpo" hidden></div>
+    <div class="pdf-bloco">
+      <h3>Os meus rituais em PDF</h3>
+      <p>Uma folha só tua: os teus gestos para o corpo, o projeto família e a marca. Para guardar, imprimir ou pôr no frigorífico.</p>
+      <span class="conta-gestos"></span>
+      <button type="button" id="gerar-pdf">Criar o meu PDF</button>
+      <p class="pdf-estado" id="pdf-estado" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- FERRAMENTAS -->
+  <section id="ferramentas">
+    <h2 class="sec-titulo">As tuas Ferramentas</h2>
+    <p class="texto">Áudios gravados pela minha voz, para usares sempre que precisares. Toca para ouvir.</p>
+    <div class="audios" data-grupo="ferramentas"></div>
+  </section>
+
+  <!-- E AGORA? -->
+  <section id="e-agora">
+    <h2 class="sec-titulo">E agora?</h2>
+    <p class="texto">Agora vives. Vai devagar, uma camada de cada vez, e deixa o corpo integrar o que a mente já sabe. Volta às tabelas sempre que precisares: o teu mapa não muda, mas a tua relação com ele aprofunda-se.</p>
+    <p class="texto">Porque nada menos do que tudo é T-U-D-O.</p>
+    <p class="assin">Um xiii, Rita</p>
+  </section>
+
+  <p class="a-chegar">O teu guia vai crescer contigo. Ainda a chegar: as quatro masterclasses gravadas, até ao final de dezembro de 2026. Tudo isto fica teu, para sempre.</p>
+
+  <p class="rodape">Rituals · #Docaraças<br>Embodiement by Design · Rita Silva Soares</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function () {
+  /* ---------- ÁUDIOS ----------
+     ficheiro: o nome do áudio na pasta "audios", junto a esta página.
+     drive: enquanto o ficheiro não está aqui, o botão abre o áudio no Drive. */
+  var AUDIOS = {
+    'boas-vindas': [
+      { nome: 'Áudio de boas-vindas · Parte 1', ficheiro: 'audios/01-boas-vindas-parte-1.mp4', drive: 'https://drive.google.com/file/d/1-5vbCSHU_9z7S22VNdZyA12zlAa70HP3/view' },
+      { nome: 'Áudio de boas-vindas · Parte 2', ficheiro: 'audios/02-boas-vindas-parte-2.mp4', drive: 'https://drive.google.com/file/d/1HfANBT5YW2XM2XNBrdVq_-RP4v5yIQyH/view' },
+      { nome: 'Áudio de boas-vindas · Parte 3', ficheiro: 'audios/03-boas-vindas-parte-3.mp4', drive: 'https://drive.google.com/file/d/1J7cTvn-Hp708RN2Vl1Vdv390ylRZz93k/view' }
+    ],
+    'ferramentas': [
+      { nome: 'Meditação do Desconforto', desc: 'Para quando o corpo aperta e tu queres fazer-lhe companhia em vez de o calar. Cerca de 7 minutos.', ficheiro: 'audios/04-meditacao-desconforto.mp4', drive: 'https://drive.google.com/file/d/1-Kcrd2Tu8VA6ndpPWk1jeJ9JO0C1sm4p/view' },
+      { nome: 'Meditação de Pedir Suporte e Manifestação', desc: 'Para quando precisas de ajuda e queres abrir espaço ao que desejas receber. Cerca de 3 minutos.', ficheiro: 'audios/05-pedir-suporte-manifestacao.mp4', drive: 'https://drive.google.com/file/d/1fxQgk-PRG6utGS92KY-jii1qqm5kNNUm/view' },
+      { nome: 'Neurocepção', desc: 'Um varrimento de cerca de cinco minutos para ouvires as tuas sensações, emoções e pensamentos, e regulares o sistema nervoso.', ficheiro: 'audios/06-neurocepcao.mp4', drive: 'https://drive.google.com/file/d/1xN5OqgNiwlur44BIoJuOT26WMIyHhLSk/view' },
+      { nome: 'Exercício dos Medos', desc: 'O mais profundo. Um convite a olhares de frente para os teus medos e a deixares de agir por medo, para agires por amor. Cerca de 14 minutos.', ficheiro: 'audios/07-exercicio-medos.mp4', drive: 'https://drive.google.com/file/d/1fxXvD2gT2pwqL1RqETlvwC6dMfdDsrsr/view' }
+    ]
+  };
+
+  /* ---------- O MAPA ENERGÉTICO (texto do guia, tal como está) ----------
+     Cada linha: [dado, significado rápido, corpo, projeto família, marca] */
+  var TIPOS = ['Manifestadora', 'Geradora', 'Geradora Manifestante', 'Projetora', 'Refletora'];
+  var T = {
+    tipo: { titulo: 'Tipo de Energia', sub: 'quem és, em geral', chave: 'tipo', linhas: {
+      'Manifestadora': ['Manifestadora', 'Estás aqui para iniciar e abrir caminhos. Energia em picos, não contínua.', 'Surtos de energia seguidos de repouso profundo.', 'Lideras o movimento; informa para trazer todos contigo.', 'Inicias o novo, não esperas permissão para começar.'],
+      'Geradora': ['Geradora', 'Tens força vital sustentável quando fazes o que amas.', 'A energia renova-se ao gastá-la no que te acende.', 'Presença calorosa e constante quando estás no teu sim.', 'Maestria pela repetição do que amas.'],
+      'Geradora Manifestante': ['Geradora Manifestante', 'Multi-paixões e rápida, fazes várias coisas ao mesmo tempo.', 'Precisa de descarregar energia e variar o movimento.', 'Ritmo veloz; partilha a direção para não dispersar os outros.', 'Podes ter muitas frentes, é design, não falta de foco.'],
+      'Projetora': ['Projetora', 'Não tens sacral. A tua força é guiar e ver os outros, não fazer continuamente.', 'Não foi desenhado para produção contínua, repousa entre projetos.', 'Guias quando és pedida; não geres tudo sozinha.', 'Mentora e estratega, o valor está em guiar, não em executar.'],
+      'Refletora': ['Refletora', 'Todos os centros abertos, és um espelho do ambiente e da comunidade.', 'Muito sensível aos lugares e às pessoas à volta.', 'Sentes a saúde do sistema familiar antes de todos.', 'Lês o que está vivo na comunidade; decide com tempo.']
+    }},
+    estrategia: { titulo: 'Estratégia', sub: 'como fazes acontecer', chave: 'tipo', linhas: {
+      'Manifestadora': ['Informar (Manifestadora)', 'Avisas antes de agir, e a resistência cai.', 'Segue o impulso de iniciar quando vem em onda.', 'Diz o que vais fazer antes de o fazeres.', 'Anuncia os teus movimentos: iniciar é o teu dom.'],
+      'Geradora': ['Responder (Geradora)', 'Esperas algo a que responder antes de avançar.', 'A energia certa acende-se na resposta, não na força.', 'Responde ao que surge em casa, sem te anteciparares.', 'Constrói a partir do que te pedem e te acende.'],
+      'Geradora Manifestante': ['Responder e informar (Geradora Manifestante)', 'Respondes primeiro, depois informas a tua direção.', 'Segue o sim do corpo e avisa antes de mudar de rumo.', 'Avisa os teus saltos, não te acompanham sem mapa.', 'Age sobre o que responde em ti e comunica os pivots.'],
+      'Projetora': ['Esperar o convite (Projetora)', 'Entras quando és reconhecida e convidada.', 'Iniciar sem convite ativa stress; aguardar regula-te.', 'Espera que te peçam orientação antes de a dares.', 'Posiciona-te e deixa o convite vir.'],
+      'Refletora': ['Esperar um ciclo lunar (Refletora)', 'Antes de uma decisão grande, deixas passar cerca de 28 dias.', 'A clareza precisa de tempo e do ambiente certo.', 'Não decidas no calor do momento, dorme sobre isso.', 'Deixa lançamentos amadurecer um ciclo.']
+    }},
+    assinatura: { titulo: 'Assinatura', sub: 'o sinal de que estás no caminho certo', chave: 'tipo', linhas: {
+      'Manifestadora': ['Paz (Manifestadora)', 'Sentes paz quando informas e ages livre.', 'O corpo solta-se, sem resistência à volta.', 'Casa em paz é estares a iniciar e a informar bem.', 'Os movimentos que te trazem paz são os alinhados.'],
+      'Geradora': ['Satisfação (Geradora)', 'Satisfeita ao fim do dia, mesmo cansada.', 'Cansaço bom, sono profundo: gastaste-te no que amas.', 'O que te satisfaz transborda para a casa.', 'O trabalho que te satisfaz é o que merece crescer.'],
+      'Geradora Manifestante': ['Satisfação e paz (Geradora Manifestante)', 'Satisfeita por fazer, em paz por teres avisado.', 'Descarregaste energia sem deixar pontas soltas.', 'Tranquila quando respondeste e informaste.', 'Várias frentes coexistem se cada uma te satisfaz.'],
+      'Projetora': ['Sucesso (Projetora)', 'As coisas fluem e és reconhecida e convidada.', 'Sensação de ser vista, de estar no lugar certo.', 'És procurada para orientar, sem teres de te impor.', 'Clientes certos chegam com reconhecimento.'],
+      'Refletora': ['Surpresa (Refletora)', 'Cada dia te surpreende, com leveza.', 'Encanto e novidade saudável, não exaustão.', 'Surpresas agradáveis são sinal de ambiente certo.', 'Quando o caminho te surpreende, estás alinhada.']
+    }},
+    tema: { titulo: 'Tema / Não-Eu', sub: 'o sinal que te devolve ao caminho', chave: 'tipo', linhas: {
+      'Manifestadora': ['Raiva (Manifestadora)', 'Surge na resistência, sinal de que não informaste.', 'É um sinal, não um erro: avisei antes de agir?', 'Raiva em casa é teres agido sem informar.', 'Mostra onde te impuseste sem preparar o terreno.'],
+      'Geradora': ['Frustração (Geradora)', 'Surge ao iniciar sem resposta ou repetir o que não te acende.', 'É um sinal, não um erro: a que é que disse sim sem o meu corpo me acender?', 'Indica onde te forçaste em vez de responderes.', 'Mostra onde saíste da resposta genuína.'],
+      'Geradora Manifestante': ['Frustração e raiva (Geradora Manifestante)', 'De não responderes e de não informares.', 'É um sinal, não um erro: respondi a isto? avisei antes de saltar?', 'Sinaliza saltos não comunicados.', 'Mostra onde forçaste uma frente sem sim interno.'],
+      'Projetora': ['Amargura (Projetora)', 'Surge quando dás sem reconhecimento ou entras sem convite.', 'É um sinal, não um erro: onde entrei sem convite?', 'Indica onde geriste sem ser pedida.', 'Amargura com clientes é teres dado sem reconhecimento. Reajusta.'],
+      'Refletora': ['Desapontamento (Refletora)', 'Surge quando o ambiente certo não aparece.', 'É um sinal, não um erro: o lugar onde estou faz-me bem?', 'Sinaliza um sistema familiar a precisar de cuidado.', 'Mostra que decidiste sem dar tempo ao ciclo.']
+    }},
+    autoridade: { titulo: 'Autoridade', sub: 'como decides', chave: 'autoridade', linhas: {
+      'Emocional (Plexo Solar)': ['Emocional (Plexo Solar)', 'Não há verdade no agora, a clareza vem ao longo da onda.', 'Decide a meio da onda: nem no pico (alegria, excitação, entusiasmo) nem no fundo (tristeza, raiva, desapontamento, frustração).', 'O que é grande não se decide no calor do momento, dá-lhe uma noite ou mais.', 'Nenhum sim urgente é de confiar. Dorme sobre ofertas e parcerias.'],
+      'Sacral': ['Sacral', 'O corpo responde no instante. Só um sim de corpo inteiro é sim, morno ou nim é não.', 'Sente na barriga: abre por inteiro (sim) ou qualquer hesitação (não).', 'Faz perguntas de sim ou não e confia só no sim pleno.', 'Avança no que te abre toda; o mais ou menos é não.'],
+      'Esplénica (Baço)': ['Esplénica (Baço)', 'Intuição instantânea que fala uma vez. O não (o alerta) é mais forte e claro do que o sim.', 'Respeita o alerta subtil, arrepio, contração; a primeira impressão é a verdadeira.', 'Notas algo errado? Confia no aviso, sem justificar.', 'O baço fala uma vez, segue o não sobretudo, sem pedir validação.'],
+      'Ego / Coração': ['Ego / Coração', 'Decides pelo que o coração quer mesmo e pelo que tens vontade de sustentar.', 'Pergunta: quero isto? tenho vontade para isto? Respeita o não quero.', 'Só te comprometes com o que o coração deseja, promessas vazias custam-te.', 'Diz sim ao que queres mesmo; o desejo é a bússola, não o dever.'],
+      'Auto-Projetada (Centro G)': ['Auto-Projetada (Centro G)', 'A tua verdade aparece quando te ouves falar, pela voz, não pela cabeça.', 'Repara no tom da tua voz ao falar: a verdade soa diferente da dúvida.', 'Fala as decisões em voz alta com alguém de confiança que só escute.', 'Processa as escolhas falando; a direção certa revela-se ao ouvires-te.'],
+      'Mental / Ambiente': ['Mental / Ambiente', 'Decides ao processar em voz alta, no ambiente certo e com gente de confiança.', 'Não há autoridade interna fixa, o ambiente e a conversa trazem a clareza.', 'Conversa as decisões com várias pessoas de confiança antes de fechar.', 'Usa pares e mentores como caixa de ressonância; o ambiente certo decide contigo.'],
+      'Lunar (Refletora)': ['Lunar (Refletora)', 'A clareza chega ao fim de um ciclo lunar (cerca de 28 dias) de sentir e conversar.', 'Deixa a decisão repousar uma lua inteira; o corpo muda com as fases.', 'Não decidas grandes mudanças à pressa, leva-as ao longo do mês.', 'Deixa decisões importantes amadurecer um ciclo antes de te comprometeres.']
+    }},
+    perfil: { titulo: 'Perfil', sub: 'como te relacionas com a vida e com os outros', chave: 'perfil', linhas: {
+      '1/3': ['1/3 · Investigadora / Mártir', 'Precisas de bases sólidas e aprendes por tentativa e erro.', 'O corpo assenta quando estudaste a fundo; segurança vem de saber.', 'Partilhas o que descobriste; erros são aprendizagem, não falha.', 'Autoridade por domínio profundo e método testado na prática.'],
+      '1/4': ['1/4 · Investigadora / Oportunista', 'Base sólida de saber, partilhada pela tua rede de relações.', 'Precisas de fundamento seguro para te sentires firme.', 'A tua influência flui pelos laços próximos.', 'Cresces por relações e indicação, com saber sólido por trás.'],
+      '2/4': ['2/4 · Eremita / Oportunista', 'Talento natural que precisa de recolhimento, e é chamado pela tua rede.', 'Honra o tempo a sós; é onde recarregas o dom.', 'És chamada pelos próximos; deixa-te convidar, não te imponhas.', 'O teu dom é reconhecido e chamado pela rede, sem te promoveres à força.'],
+      '2/5': ['2/5 · Eremita / Herética', 'Dom natural recolhido e projeção dos outros, que esperam soluções tuas.', 'O recolhimento protege-te da pressão das projeções.', 'Nem tudo o que projetam em ti é teu, gere as expectativas.', 'Atrais quem espera soluções práticas; entra quando és chamada.'],
+      '3/5': ['3/5 · Mártir / Herética', 'Aprendes por experiência e tens soluções práticas que os outros procuram.', 'Resiliência pelo corpo; cada erro gera sabedoria.', 'Partilha o que testaste; não carregues projeções alheias.', 'Vendes o que provaste na pele, a tua experiência é a prova.'],
+      '3/6': ['3/6 · Mártir / Modelo', 'Tentativa e erro na 1ª fase; depois tornas-te modelo de sabedoria.', 'Honra as fases; a meio da vida o corpo pede observação.', 'Os teus erros viram exemplo; tornas-te referência com o tempo.', 'Autoridade que amadurece, a tua história torna-se o teu valor.'],
+      '4/6': ['4/6 · Oportunista / Modelo', 'Influência pela rede próxima e sabedoria que se torna modelo.', 'Relações certas regulam-te; observação a meio da vida.', 'Os laços são o teu chão; a lealdade conta muito.', 'Cresces por confiança e rede; tornas-te referência.'],
+      '4/1': ['4/1 · Oportunista / Investigadora', 'Base fixa de saber partilhada por relações, rumo firme, pouco flexível.', 'Precisas de fundamento e de vínculos estáveis.', 'Os laços próximos são essenciais e fixos.', 'Saber sólido e rede de confiança; a direção é firme, e está bem.'],
+      '5/1': ['5/1 · Herética / Investigadora', 'Soluções práticas com base sólida, os outros projetam muito em ti.', 'Fundamenta-te bem; a projeção alheia pesa no corpo.', 'Sê clara para não carregar o que projetam em ti.', 'És vista como quem resolve; entrega prática sustentada por método.'],
+      '5/2': ['5/2 · Herética / Eremita', 'Soluções projetadas em ti, a partir de um dom natural recolhido.', 'O recolhimento equilibra a pressão de salvar.', 'Sê chamada; protege o teu espaço das projeções.', 'Reputação de quem resolve; aparece quando chamada, sem te expores demais.'],
+      '6/2': ['6/2 · Modelo / Eremita', 'Modelo de sabedoria com dom natural, vives por fases.', 'Recolhimento e observação a meio da vida regulam-te.', 'Referência calma; és chamada pelo teu dom.', 'Autoridade que amadurece; o exemplo fala mais que a promoção.'],
+      '6/3': ['6/3 · Modelo / Mártir', 'Sabedoria forjada por muita experiência, modelo de altos e baixos.', 'Honra as fases; o corpo aprende fazendo.', 'Os teus altos e baixos viram sabedoria partilhável.', 'Autenticidade crua, a tua jornada é a tua autoridade.']
+    }},
+    emocoes: { titulo: 'Processar Emoções', sub: 'como vives e decides com as emoções', chave: 'emocional', linhas: {
+      'Emocional': ['Emocional', 'Tens onda emocional própria, os teus altos e baixos são energia tua, não reação ao momento. A clareza vem com o tempo.', 'Sente a onda sem agir nela; decide a meio, depois de assentar.', 'As tuas emoções são tuas e legítimas; diz que precisas de tempo antes de responder.', 'Não publiques nem decidas no pico nem no fundo, deixa a onda passar.'],
+      'Não-Emocional': ['Não-Emocional', 'Não tens onda própria, sentes e amplias as emoções dos outros e do ambiente. Podes ter clareza imediata.', 'O peso muitas vezes não é teu: sai do ambiente e vê se dissolve.', 'Em tensão, pergunta: esta emoção é minha ou apanhei-a? Não carregues o clima de todos.', 'Leitura emocional rápida e limpa, sentes o que a cliente precisa, sem te afogares nisso.']
+    }}
+  };
+
+  var CENTROS = ['Cabeça', 'Ajna', 'Garganta', 'G / Self', 'Coração / Ego', 'Plexo Solar', 'Sacral', 'Baço', 'Raiz'];
+  var C = {
+    'Cabeça · Definido': ['Inspiração e pressão mental tuas e consistentes.', 'A pressão de pensar é tua, estável.', 'Trazes perguntas e inspiração à casa.', 'Fonte fiável de temas e ideias próprios.'],
+    'Cabeça · Aberto': ['Absorves as dúvidas dos outros, pressão que não é tua.', 'Pergunta: esta preocupação é minha ou apanhei-a?', 'És esponja para as ansiedades de todos; observa sem as tomar.', 'A pressão mental do mercado não é tua para resolver.'],
+    'Ajna · Definido': ['Forma fixa e consistente de pensar e conceptualizar.', 'Mente estável, conclusões consistentes.', 'Trazes estrutura e certezas úteis.', 'Frameworks consistentes são teu recurso.'],
+    'Ajna · Aberto': ['Mente fluida, vês várias perspetivas sem te prenderes.', 'Cuidado com a pressão de ter de saber.', 'Facilitas quando todos estão presos no seu ponto de vista.', 'A pergunta certa vale mais do que a resposta fixa.'],
+    'Garganta · Definido': ['Voz e expressão consistentes, comunicas com facilidade.', 'A voz flui sem esforço.', 'Dás o tom com naturalidade.', 'Comunicação fiável; a tua voz é um motor.'],
+    'Garganta · Aberto': ['Falas melhor quando convidada, o silêncio é o teu estado natural.', 'Forçar a expressão sem convite drena-te.', 'Espera que te perguntem antes de partilhar.', 'Conteúdo a partir do convite, não da pressão de publicar.'],
+    'G / Self · Definido': ['Identidade e direção fixas, sabes quem és e para onde vais.', 'Sentido de rumo estável, de dentro.', 'Âncora de identidade para a casa.', 'Direção e voz próprias consistentes.'],
+    'G / Self · Aberto': ['Identidade fluida, moldas-te ao ambiente e às pessoas.', 'O lugar certo regula-te; o errado desorienta.', 'Lês quem cada um é com precisão.', 'Versatilidade: guias os outros a encontrar o seu rumo.'],
+    'Coração / Ego · Definido': ['Força de vontade consistente, cumpres o que prometes.', 'Energia para sustentar compromissos.', 'És palavra que se cumpre.', 'Confiança nas metas e promessas que assumes.'],
+    'Coração / Ego · Aberto': ['Sem vontade constante, não tens de provar o teu valor.', 'Cuidado com promessas para impressionar; o corpo paga.', 'O teu valor existe, não se ganha.', 'Não competir, não provar, deixa o trabalho falar.'],
+    'Plexo Solar · Definido': ['Tens onda emocional própria, a clareza vem com o tempo.', 'Espera a onda assentar antes de decidir.', 'As tuas emoções são tuas; honra o ritmo.', 'Não decidas no pico nem no fundo emocional.'],
+    'Plexo Solar · Aberto': ['Absorves e amplias as emoções à volta, não são tuas.', 'Pesado? Sai do ambiente; dissolve com espaço.', 'Em conflito, pergunta: é meu ou do ambiente?', 'Clareza emocional imediata e limpa, um recurso.'],
+    'Sacral · Definido': ['Energia de vida sustentável, feita para o trabalho que amas.', 'Gasta a energia todos os dias; vai cansada para a cama.', 'Resistência e presença consistentes.', 'Capacidade de construir e repetir com energia.'],
+    'Sacral · Aberto': ['Sem energia sacral constante, pegas energia emprestada.', 'Descansa antes de precisares; o sinal vem da exaustão.', 'Não te compares com quem tem energia contínua.', 'O poder está em saber quando parar, não em produzir.'],
+    'Baço · Definido': ['Intuição e instinto de saúde fiáveis, fala uma vez.', 'Sistema imunitário forte; ouve os sinais subtis.', 'Instinto de segurança natural em casa.', 'Confia no primeiro sim ou não, sem justificar.'],
+    'Baço · Aberto': ['Sentes o bem-estar dos outros; o medo absorvido não é teu.', 'Cuidado em agarrar o que já não te serve.', 'Distingue o teu instinto do medo do ambiente.', 'Não decidas por medo apanhado do campo.'],
+    'Raiz · Definido': ['Pressão adrenal consistente, combustível estável para agir.', 'Alterna picos de ação com quietude real.', 'Rocha estável no caos.', 'Energia fiável para concretizar sob pressão.'],
+    'Raiz · Aberto': ['Amplias a pressão e a pressa dos outros, não é tua.', 'Pergunta: esta pressa é minha? Não corras emprestada.', 'Não deixes a urgência alheia ditar o ritmo de casa.', 'Liberta-te do despachar para me livrar da pressão.']
+  };
+
+  /* Perfil de Vitalidade e Manifestação (texto do guia, tal como está). Cada linha: [dado, significado, corpo, família, marca, perda de peso] */
+  var V = {"vitTipo": {"titulo": "Tipo de Energia (Vitalidade)", "sub": "como o teu corpo se nutre, move e descansa", "chave": "tipo", "linhas": {"Projetora": ["Projetora (não-energética)", "Aura absorvente e sensível, menos energia constante, e o alimento tem grande impacto em ti.", "Refeições mais leves e frequentes; movimento suave, nunca até à exaustão. Descansa antes de precisares.", "Modela em casa o ritmo mais lento; não acompanhes ao prato a energia dos outros.", "Trabalha em ciclos curtos e focados, a tua energia gere-se, não se força.", "A forma vem de dormir e descansar mais, desacelerar e cuidar da qualidade do alimento. Comer a mais sinaliza cansaço ou falta de reconhecimento, cuida disso, não do prato."], "Manifestadora": ["Manifestadora (não-energética)", "Ser energético em impulsos, a energia vem em ondas, não é constante.", "Segue o flow: fases de mais e de menos movimento. Não te cobres constância.", "Informa o teu ritmo à casa; respeita as fases sem culpa.", "Inicia quando o impulso chega; descansa entre picos.", "A forma alinha-se quando falas, comes e fazes o que realmente queres. Repara onde te calas ou te forças, é aí que o corpo retém."], "Refletora": ["Refletora (não-energética)", "Todos os centros abertos, espelho do ambiente. Quanto mais natural a comida, melhor.", "Movimento leve, nunca até à exaustão; o ambiente certo muda tudo no corpo.", "O ambiente de casa regula-te, cuida dele como cuidarias de ti.", "O teu ritmo muda com a lua e os lugares; não te prendas a um padrão fixo.", "Repara como o apetite muda quando estás com outras pessoas, comes o que absorves. A forma vem do ambiente certo e da comida natural."], "Geradora": ["Geradora (energética)", "Sacral definido, muita energia, refeições mais substanciais. Movida pelo desejo.", "Movimento que dá prazer e te desafia; gasta a energia diariamente. Deita-te gratamente exausta.", "Presença ativa e calorosa; o teu movimento contagia a casa.", "Constrói com a energia do que amas responder, o prazer sustenta o ritmo.", "Dietas de poucas calorias não funcionam em ti e geram o efeito contrário. A forma vem do movimento que amas e de gastares a energia sacral."], "Geradora Manifestante": ["Geradora Manifestante (energética)", "Sacral definido com metabolismo ainda mais rápido e fome maior. Multi-paixões.", "Precisa de descarregar muita energia e variar o movimento. Deita-te antes do sono e mantém-te ativa até ele vir.", "Ritmo veloz; partilha a direção para não dispersar os outros.", "Várias frentes com energia, segue o que responde em ti.", "Restringir é ainda pior para ti e leva a ganho de peso. A forma vem de te moveres no que te acende e de honrar a tua fome real."]}}, "vitAut": {"titulo": "Autoridade (Vitalidade)", "sub": "como decides o que e quando comer", "chave": "autoridade", "linhas": {"Emocional (Plexo Solar)": ["Emocional (Plexo Solar)", "Não foste desenhada para ser espontânea com a comida, espera a onda antes de decidir.", "Não vás à cozinha ao primeiro tenho fome; deixa o desejo assentar e vê se ainda o queres.", "Decide as refeições com alguma antecedência, não no impulso do momento.", "Nem comas nem decidas no pico ou no fundo emocional, espera clarear.", "Comer a mais costuma ser comer a emoção ou não esperar para ver se a fome é real. A forma vem de esperar a onda, não de restringir."], "Sacral": ["Sacral", "Em vez de decidires na cabeça, espera a resposta do corpo, abre o frigorífico e sente o que te acende.", "O sacral diz sim ou não a cada alimento no momento; segue essa resposta visceral.", "Pergunta ao corpo, não ao plano, o que comer; o sim pleno é o guia.", "Come e trabalha no que o corpo responde com energia; recua no que te esvazia.", "A forma vem de comer o que o sacral pede de verdade e de gastares a energia, não de planos rígidos."], "Esplénica (Baço)": ["Esplénica (Baço)", "Foste desenhada para ser espontânea, o primeiro instinto sobre o que comer está certo.", "Quando sentes tenho fome, come; confia no impulso do momento, sem o repetir.", "Sem plano alimentar: tem comida boa em casa e escolhe no momento o que apetece.", "Confia no primeiro sim ou não, sem pedir validação nem justificar.", "Não caias na pressão de comer porque os outros comem ou porque devias. A forma vem de comer só com fome real."], "Ego / Coração": ["Ego / Coração", "Decides pelo que o coração quer mesmo, o que queres, quando queres, ou ligado a um objetivo claro.", "Honra o desejo verdadeiro; o não quero também conta.", "Compromete-te só com o que o coração deseja à mesa, sem obrigação.", "Diz sim ao que queres mesmo; o desejo é a bússola, não o dever.", "Com um objetivo claro e intencional, comendo o que desejas a sério, a forma vem do desejo honrado, não da privação."], "Auto-Projetada (Centro G)": ["Auto-Projetada (Centro G)", "Tens mais clareza sobre o que e quando comer quando estás sozinha.", "A verdade sobre a comida aparece ao ouvires-te falar ou sentir, não pela cabeça.", "Decide as refeições a sós, ou falando em voz alta com quem só escute.", "Processa escolhas falando; a direção certa revela-se ao ouvires-te.", "Pela abertura, é fácil deixares-te influenciar, a forma vem de decidires sozinha, no teu centro."], "Mental / Ambiente": ["Mental / Ambiente", "Sem autoridade interna fixa, o teu sistema regula-se com consistência.", "Sê consistente nos hábitos; o corpo não foi feito para grande variação alimentar.", "Horários e hábitos estáveis dão chão a ti e à casa.", "Conversa as decisões com gente de confiança, no ambiente certo, antes de fechar.", "A forma vem da consistência tranquila, não de mudanças bruscas nem de restrição."], "Lunar (Refletora)": ["Lunar (Refletora)", "A clareza chega ao longo do ciclo, abre-te ao que sentes vontade de comer.", "Segue o que o corpo pede em cada fase, sem plano fixo; o apetite varia.", "Deixa o apetite mudar com a lua e o ambiente; não te prendas a um padrão.", "Decisões grandes ao longo de um ciclo lunar, não num só dia.", "A forma vem de seguir a variação natural do apetite e do ambiente certo, não de regras fixas."]}}, "digestao": {"titulo": "Tipo de Digestão", "sub": "como, quando e onde o teu corpo se nutre melhor", "chave": "digestao", "linhas": {"Apetite · Consecutivo (Caçador)": ["Apetite · Consecutivo (Caçador)", "Arquétipo do Homem da Caverna. Comes só o que te apetece, um alimento de cada vez (podes repetir 10 min depois).", "Escolhe o ingrediente que realmente te anima e come só esse. Simples e direto.", "Podes preferir o prato desmontado, cada coisa a seu tempo. É saudável para ti.", "Foco num assunto de cada vez nutre-te mais do que misturar tudo.", "A forma vem de comer só com apetite genuíno, um de cada vez. O corpo auto-regula-se quando não o forças."], "Apetite · Alternado (Coletor)": ["Apetite · Alternado (Coletor)", "Homem da Caverna, na versão coletora. Simples como o consecutivo, mas alternas os alimentos, provando um e outro.", "Vai alternando os ingredientes; testa o que te apetece a cada garfada.", "Pratos simples com alguns alimentos para alternar agradam-te.", "Alternar entre poucas tarefas, sem misturar tudo, mantém-te leve.", "A forma vem de seguir o apetite real, alternando com leveza. Sem regra, sem contagem."], "Sabor · Aberto": ["Sabor · Aberto", "Arquétipo do Produtor. O corpo precisa de provar coisas diferentes para saber do que gosta. Pede experimentação.", "Abre-te ao novo, em ressonância com a estação, e repara como o corpo reage.", "Trazes variedade à mesa; a abertura a novos sabores faz-te bem.", "A curiosidade por novidade alimenta a tua criação.", "A forma vem de confiar no teu gosto: se te sabe bem e o corpo gosta, é saudável. Não é variar por obrigação nem cortar."], "Sabor · Fechado": ["Sabor · Fechado", "Produtor, na versão fechada. Comes o mesmo até mudar a estação (ou viajares). A repetição liberta a tua mente.", "Mesmas refeições, às mesmas horas; a consistência nutre-te.", "Não precisas de variar para fazer bem; o simples chega.", "Rotina e repetição dão-te foco e energia mental.", "A forma vem da consistência que te assenta, não de dietas que mudam toda a semana."], "Sede · Quente": ["Sede · Quente", "Arquétipo do Transformador. Regulas o sistema digestivo pela temperatura: o quente apoia-te.", "Chás, sopas, caldos, cozinhados. Se comeres algo frio, junta algo quente por cima.", "Refeições quentes em conjunto regulam o teu sistema.", "Algo quente antes de criar ou de calls ativa a tua clareza.", "A forma vem de comer no teu tom térmico: bem digerido, o corpo larga o que não precisa."], "Sede · Fria": ["Sede · Fria", "Transformador, na versão fria. O corpo regula-se melhor com alimentos frescos e frios.", "Sumos, batidos, bowls, fruta. Se comeres algo quente, deixa arrefecer e junta algo fresco.", "Pratos frescos em conjunto, menos cozinhados pesados.", "Algo fresco mantém-te leve e clara ao trabalhar.", "A forma vem de comer no teu tom: o frio ajuda-te a assimilar e a libertar, sem contagem."], "Toque · Calmo": ["Toque · Calmo", "Arquétipo do Determinante. É sobre o ambiente em que comes. Procuras muito estímulo, por isso precisas de calma para equilibrar.", "Come sozinha ou em ambiente tranquilo; a calma ajuda a digerir.", "Protege refeições sem agitação; um canto sereno é o teu lugar.", "Comer em paz, sem ecrãs, regula-te entre tarefas.", "A forma vem de comer em calma: o corpo assimila melhor quando não está em alerta."], "Toque · Nervoso": ["Toque · Nervoso", "Determinante, na versão nervosa. O ambiente precisa de acordar o corpo para a digestão.", "TV, movimento, restaurante, comer acompanhada: o estímulo ajuda-te a digerir.", "Refeições animadas, com companhia e algum ruído, fazem-te bem.", "Ambientes com vida e movimento mantêm a tua energia.", "A forma vem de comer no ambiente que te ativa, não em silêncio forçado."], "Som · Alto": ["Som · Alto", "Arquétipo do Ouvinte. A tua digestão depende da acústica: precisas de som para absorver.", "TV, podcast, música ou conversa à mesa ajudam-te a assimilar.", "Refeições com som e vida nutrem-te.", "Ambientes sonoros estimulam a tua absorção, de comida e de ideias.", "A forma vem de comer com o som que te ativa, não em silêncio que te trava."], "Som · Baixo": ["Som · Baixo", "Ouvinte, na versão silenciosa. O barulho incomoda-te e impede a absorção.", "Ambiente silencioso e calmo; come sem ruído para assimilar bem.", "Protege momentos de comer em silêncio.", "Pausas silenciosas para comer recarregam-te.", "A forma vem do silêncio que te deixa absorver, não de regras ao prato."], "Luz · Direta": ["Luz · Direta", "Arquétipo do Observador. O cérebro ativa-se com claridade: o corpo digere melhor com luz.", "Come com luz natural e clara; quanto mais luz, melhor assimilas.", "Mesa bem iluminada, à luz do dia quando possível.", "Trabalhar e comer com luz mantém-te ativa e clara.", "A forma vem de comer à luz que te ativa, com presença, não no escuro distraída."], "Luz · Indireta": ["Luz · Indireta", "Observador, na versão sensível à luz. Precisas de luz suave para funcionar melhor.", "Luz baixa e acolhedora; o ambiente ameno ajuda a digestão.", "Refeições em ambiente suave, sem luz dura.", "Espaços de luz amena, sem agressão visual, nutrem-te.", "A forma vem do ambiente suave que te acalma, não da pressão."]}}, "rotina": {"titulo": "Rotina", "sub": "o ritmo e a mente que te regulam (a primeira seta)", "multi": [["rotina", {"Rotina · Esquerda (ativo)": ["Rotina · Esquerda (ativo)", "Funcionas melhor com consistência: mesmos horários, mesmas tarefas. Energia de iniciar e fazer.", "Come e move-te a horas consistentes; a estrutura regula-te (segue a fome, sem plano rígido).", "Horários e rotinas estáveis dão chão à casa.", "Define horas fixas para nutrir, trabalhar e descansar: a consistência liberta-te.", "A forma vem da consistência que assenta o corpo, não de regras de privação."], "Rotina · Direita (passivo)": ["Rotina · Direita (passivo)", "Não te prendas a um padrão fixo. Vai com o flow, com mais variedade e flexibilidade.", "Deixa os horários variar conforme o corpo pede; a flexibilidade nutre-te.", "Ritmo flexível em casa, sem agenda rígida.", "Trabalha por fluxo, não por horário fixo: a variedade mantém-te viva.", "A forma vem de seguires o flow do corpo, não de uma rotina forçada."]}], ["cerebro", {"Cérebro · Esquerda (ativo)": ["Cérebro · Esquerda (ativo)", "Mente sempre em alerta, a processar o ambiente. Gasta mais energia, por isso pede mais alimento.", "Come com regularidade; jejuns não te servem, a mente precisa de fluxo constante de energia.", "Estímulo e informação à volta fazem-te bem.", "A tua mente ativa lê o ambiente o tempo todo: usa isso, mas alimenta-a.", "A forma vem de alimentar bem a mente ativa, não de a privar."], "Cérebro · Direita (passivo)": ["Cérebro · Direita (passivo)", "A mente acende-se no não-fazer: é na pausa e no vazio que tem as melhores ideias.", "Precisas de tempo de ócio e descanso mental para regular.", "Protege espaços de quietude, sem estímulo constante.", "As melhores ideias vêm no descanso: agenda espaço vazio.", "A forma vem do descanso mental que regula o sistema, não da pressão."]}]]}, "exercicio": {"titulo": "Exercício Físico", "sub": "como o teu corpo se move melhor", "multi": [["tipo", {"Geradora": ["Geradora", "Ser energético: recebes energia diária para gastar no que te dá prazer. Precisas de te mover.", "Movimento que amas e te desafia, com frequência. A falta dele traz estagnação e sono difícil.", "O teu movimento contagia a casa com vida.", "Mover o corpo descarrega a mente e abastece a criação.", "A forma vem do exercício que amas, não de queimar à força."], "Geradora Manifestante": ["Geradora Manifestante", "Como a Geradora, com ainda mais energia para descarregar e necessidade de variar.", "Descarrega energia todos os dias; alterna entre atividades.", "Ritmo veloz e ativo; partilha a direção para não dispersar.", "Várias formas de movimento, conforme o que te acende.", "A forma vem de te moveres no que te acende. Restringir piora o efeito."], "Manifestadora": ["Manifestadora", "Energia em impulsos: muito gás numa fase, leve noutra.", "Segue o flow, sem te cobrares constância.", "Informa o teu ritmo; respeita as fases sem culpa.", "Move-te quando o impulso pede; descansa entre picos.", "A forma vem de respeitar as fases, não de uma rotina rígida."], "Projetora": ["Projetora", "Ser não-energético: o sistema não foi feito para alto volume intenso e frequente. Ritmo mais lento.", "Nunca até à exaustão. Movimento suave e descanso a sério.", "Modela em casa o ritmo mais lento.", "Move-te e trabalha em ciclos curtos: o descanso é produtividade.", "A forma vem de desacelerar e descansar, não de queimar."], "Refletora": ["Refletora", "Ser não-energético, espelho do ambiente. Muito sensível ao lugar onde te moves.", "Movimento leve, nunca até à exaustão; escolhe ambientes que te fazem bem.", "O ambiente do movimento importa tanto como o movimento.", "Ritmo que muda com a lua e os lugares, sem padrão fixo.", "A forma vem de respeitar o ritmo e o ambiente, não a intensidade."]}], ["raiz", {"Centro Raiz Definido": ["Centro Raiz Definido", "Precisas de exercício mais intenso para libertar a pressão que se acumula na Raiz.", "A intensidade solta a pressão. Se és Projetora ou Refletora, equilibra: em dia cheio, pega leve.", "Descarrega antes de chegares a casa carregada.", "Liberta a pressão no corpo para não a despejares no trabalho.", "A forma vem de libertar a pressão com movimento, com equilíbrio."], "Centro Raiz Indefinido": ["Centro Raiz Indefinido", "Atividades de menor intensidade assentam-te: yoga, ou musculação com menos intensidade e frequência.", "Menos intensidade, mais suavidade. Geradora ou GM: move-te na mesma, sem exagerar.", "Cuidado em apanhar a pressa dos outros para o teu movimento.", "Não deixes a urgência alheia acelerar o teu ritmo.", "A forma vem do movimento suave e regular, sem exagero."]}], ["canais", {"Canais entre Baço e Raiz (qualquer um definido)": ["Canais entre Baço e Raiz (qualquer um definido)", "Tens colorido algum dos canais que ligam o Baço à Raiz. Com esta definição, o corpo pede uma vida mais ativa.", "Aeróbica e desporto são ótimos para ti. Precisas de movimento regular para te sentires feliz, radiante e saudável.", "A tua vitalidade ativa anima a casa.", "A energia da atividade sustenta o teu fazer e a tua presença.", "A forma vem de uma vida ativa que te traz prazer e te faz radiante, não de obrigação."]}]]}, "manifestacao": {"titulo": "Processo de Manifestação", "sub": "como dás forma ao que desejas. Lê o teu valor em cada eixo", "multi": [["manif1", {"Específico": ["Específico", "Sabes exatamente o que queres. Manifestas ao focar em detalhes concretos e claros.", "Dá ao corpo imagens nítidas do que desejas; a clareza do detalhe energiza-te.", "Define ao pormenor o que queres criar em casa.", "Objetivos e visões concretas funcionam para ti: nomeia o que queres."], "Inespecífico": ["Inespecífico", "Manifestas em abertura. Defines a essência ou o sentimento e deixas o universo preencher os detalhes.", "Fixares-te em detalhes concretos bloqueia-te; sente a direção, não a forces.", "Aponta o sentimento que queres em casa, sem agarrar o como.", "Define a essência e deixa o caminho revelar-se, sem metas rígidas ao detalhe."]}], ["manif2", {"Ativo": ["Ativo", "Manifestas através da ação e do movimento. Fazer e ir atrás ativa o teu campo.", "O movimento e a ação acendem o teu poder de criar.", "Crias o que queres em casa pondo mãos à obra.", "Avança, experimenta, age: é assim que as coisas ganham forma para ti."], "Inativo (recetivo)": ["Inativo (recetivo)", "Manifestas através do ser e da quietude. Meditação, natureza, silêncio e descanso ativam o teu campo magnético.", "O esforço de fazer acontecer bloqueia-te; descansa e abre espaço.", "Cria a partir da presença e da quietude, não da força.", "As coisas chegam quando paras e te abres, não quando empurras."]}]]}, "ambiente": {"titulo": "Tipo de Ambiente", "sub": "onde o teu corpo prospera. Os tons em inglês, como na fonte", "chave": "ambiente", "linhas": {"Cavernas · Selective": ["Cavernas · Selective", "Espaço protegido e privado onde o corpo assenta. Versão seletiva: escolhes a dedo quem e o que entra.", "Protege as costas; um canto recolhido e curado regula-te.", "Cria em casa um refúgio fechado, só teu.", "Trabalha num espaço protegido, sem interrupções.", "A forma vem de te sentires segura e contida: o sistema nervoso solta no espaço certo."], "Cavernas · Blending": ["Cavernas · Blending", "Recolhimento que se funde com o que o rodeia: mais aberto e natural.", "Um recanto acolhedor, ligado ao ambiente em volta, acalma-te.", "Casa-refúgio, mas integrada na luz e na natureza à volta.", "Espaço próprio que respira com o ambiente, sem isolamento total.", "A forma vem do aconchego que não te fecha: o corpo regula quando se sente seguro e ligado."], "Mercados · Internal": ["Mercados · Internal", "Espaço de troca e movimento, em ambiente fechado ou interior. Prosperas com vida à volta.", "O corpo acorda com a azáfama de um espaço interior animado.", "Casa com vida, gente a entrar e sair, mas portas dentro.", "Trabalha bem num espaço movimentado interior (coworking, escritório com pulso).", "A forma vem de estares onde há troca e movimento, não isolada."], "Mercados · External": ["Mercados · External", "Troca e movimento ao ar livre e em espaços abertos.", "Ruas, feiras, esplanadas: o corpo ativa-se no exterior animado.", "Vida de bairro, mercados, espaços abertos partilhados.", "Cria em movimento, fora de portas, onde há gente e fluxo.", "A forma vem do exterior vivo que te põe em movimento."], "Cozinhas · Wet": ["Cozinhas · Wet", "Espaço de criação e nutrição. Versão húmida: a humidade sustenta-te.", "Ambientes com humidade (perto de água, vapor) assentam ao corpo.", "Casa quente, viva, com cheiros e criação na cozinha.", "Espaços de transformação e fazer, com energia húmida e viva.", "A forma vem de estares onde o corpo se sente nutrido e em criação."], "Cozinhas · Dry": ["Cozinhas · Dry", "Criação e nutrição em ambiente seco.", "Ambientes secos e arejados (baixa humidade) regulam-te.", "Casa luminosa e seca, espaço de fazer com leveza.", "Espaços de criação arejados, sem peso húmido.", "A forma vem do ambiente seco e criativo onde o corpo trabalha bem."], "Montanhas · Active": ["Montanhas · Active", "Lugar elevado que dá perspetiva e clareza. Versão ativa: envolves-te a partir do alto.", "O corpo ganha vida ao subir e agir de um ponto de vista elevado.", "Casa num ponto alto, com vista, onde te envolves com o que vês.", "Lidera e cria de uma posição de visão ampla e ativa.", "A forma vem da clareza e do envolvimento ativo a partir do alto."], "Montanhas · Passive": ["Montanhas · Passive", "Lugares altos, recolhidos, longe dos outros, a banhar na tua própria aura.", "O corpo descansa em altura, na solidão, com ar mais leve.", "Refúgio elevado e tranquilo, longe da azáfama.", "Pensa e cria à distância, de cima, sem ruído.", "A forma vem da quietude elevada que te recolhe e regula."], "Vales · Narrow": ["Vales · Narrow", "Acústica e ligação próximas. Versão estreita: espaços fechados, som direto, conversa a dois.", "Ruas estreitas, corredores, vozes de outra divisão ou TV ligada acalmam-te.", "Casa com sons próximos, gente perto, vida audível ao lado.", "Trabalha com som direto por perto (podcast, voz, conversa a dois).", "A forma vem de te sentires ligada pelo som e pela proximidade."], "Vales · Wide": ["Vales · Wide", "Ligação pela amplitude. Versão larga: espaços amplos e naturais relaxam-te.", "Vales, paisagens abertas e horizontes largos soltam o corpo.", "Casa com vistas amplas, espaço e natureza à volta.", "Cria em espaços amplos, onde o olhar e o som respiram.", "A forma vem do espaço aberto que relaxa o sistema nervoso."], "Costas · Natural": ["Costas · Natural", "Lugar de transição onde a terra encontra a água: reflexão e renovação. Versão natural.", "Beira-mar, rios, margens naturais renovam o corpo.", "Casa perto de água natural, ou que traga esse equilíbrio.", "Cria onde há fluxo e quietude em equilíbrio, em ambiente natural.", "A forma vem do ritmo de transição natural que te renova."], "Costas · Artificial": ["Costas · Artificial", "Transição e renovação em espaços de fronteira feitos pela mão humana.", "Margens construídas, piscinas, espaços-limite urbanos regulam-te.", "Casa que recria a sensação de fronteira e fluxo, à tua maneira.", "Cria em espaços de transição desenhados, onde paras e fluis.", "A forma vem do espaço de transição que te dá pausa e renovação."]}}, "sentido": {"titulo": "Sentido Mais Forte", "sub": "por onde percebes melhor o mundo", "chave": "sentido", "linhas": {"Olfato": ["Olfato", "Percebes pelo cheiro, literal e energético: cheiras se um lugar, pessoa ou situação está certo para ti.", "Confia no que o nariz te diz; sai de ambientes que cheiram mal ao teu sistema. Aromas naturais regulam-te.", "O cheiro de casa importa: aromas que te acalmam fazem lar.", "Decide pelo cheirar a certo num projeto ou parceria: o teu instinto olfativo é fino."], "Paladar": ["Paladar", "Discernes a vida pelo gosto: provas (literal e energeticamente) e sabes logo o que é para ti.", "Refina o que comes pelo que te sabe mesmo bem; o gosto é guia, não capricho.", "És tastemaker em casa: trazes o que tem sabor e qualidade.", "Provas ideias e tendências e selecionas as que te dão satisfação real."], "Visão Externa": ["Visão Externa", "Percebes pelo que vês no exterior: notas cores, formas, padrões e estética que outros não veem.", "Ambientes visualmente belos acalmam-te e aguçam a intuição; o feio desfoca-te.", "Cuida da estética da casa: o que vês molda o teu estado.", "Organiza ideias visualmente (mood boards, esquemas); vês a estrutura nos sistemas e nas pessoas."], "Visão Interna": ["Visão Interna", "Percebes pela imagem interior: tens um mundo vívido de ideias, imagens e imaginação.", "Meditação, visualização e silêncio dão-te clareza; fecha os olhos para ver.", "Partilha as tuas visões: o teu imaginário inspira a casa.", "Visualiza objetivos e cenários: a direção certa revela-se por dentro."], "Sentir": ["Sentir", "Percebes pelo sentir: lês a energia e a atmosfera de uma pessoa ou lugar antes de pensar.", "Confia no que sentes no corpo num ambiente; o sentir é informação real.", "Sentes o clima de casa antes de todos; usa-o como bússola.", "Decisões e ligações certas sentem-se primeiro: segue essa leitura subtil."], "Tato": ["Tato", "Percebes pelo toque e pelo contacto físico: o corpo entende o mundo ao tocar.", "Texturas, abraços, contacto com a natureza e o toque regulam-te.", "O contacto físico em casa nutre-te (abraços, proximidade).", "Cria com as mãos e com materiais: o tangível dá-te clareza."]}}};
+  Object.keys(V).forEach(function (k) { T[k] = V[k]; });
+
+  /* A ordem das camadas (decidida pela Rita a 17-11).
+     '#' = título de grupo · '@' = subtítulo · '~' = camada que ainda vai entrar no guia */
+  var ORDEM = [
+    '#Principais', 'tipo', 'estrategia', 'assinatura', 'tema', 'autoridade', 'manifestacao',
+    '#Zona de Génio', '@Nutrição', 'vitTipo', 'vitAut', 'digestao', 'sentido', 'ambiente', 'rotina', 'exercicio',
+    '#Biomecânica, Interação e Conexão', 'CENTROS', 'emocoes', 'perfil'
+  ];
+
+  /* ---------- GUARDAR NO TELEMÓVEL DE QUEM USA ---------- */
+  var CHAVE = 'rituals-cartoes-v1';
+  function ler() { try { var v = JSON.parse(localStorage.getItem(CHAVE) || 'null'); if (v && v.pessoas) return v; } catch (e) {} return null; }
+  function gravar() { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); return true; } catch (e) { return false; } }
+  function cartaoVazio() { return { nome: '', tipo: '', autoridade: '', perfil: '', emocional: '', digestao: '', rotina_seta: '', cerebro: '', manif1: '', manif2: '', ambiente: '', sentido: '', canais: false, centros: {}, rotina: {} }; }
+  var estado = ler() || { atual: 'p1', pessoas: { p1: cartaoVazio() } };
+  if (!estado.pessoas[estado.atual]) estado.atual = Object.keys(estado.pessoas)[0];
+  function cartao() { return estado.pessoas[estado.atual]; }
+
+  /* ---------- CONSTRUIR O CARTÃO ---------- */
+  function $(id) { return document.getElementById(id); }
+  function encherSelect(el, opcoes) {
+    el.innerHTML = '';
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Escolhe…'; el.appendChild(o0);
+    opcoes.forEach(function (v) { var o = document.createElement('option'); o.value = v; o.textContent = v; el.appendChild(o); });
+  }
+  encherSelect($('c-tipo'), TIPOS);
+  encherSelect($('c-autoridade'), Object.keys(T.autoridade.linhas));
+  encherSelect($('c-perfil'), Object.keys(T.perfil.linhas));
+  encherSelect($('c-emocional'), Object.keys(T.emocoes.linhas));
+  var CAMPOS_V = [['c-digestao', 'digestao', Object.keys(T.digestao.linhas)], ['c-ambiente', 'ambiente', Object.keys(T.ambiente.linhas)], ['c-sentido', 'sentido', Object.keys(T.sentido.linhas)]];
+  CAMPOS_V.forEach(function (f) { encherSelect($(f[0]), f[2]); });
+  /* A seta de cima à esquerda responde à rotina e ao cérebro ao mesmo tempo */
+  var SETA_SUP = { 'Virada para a esquerda': ['Rotina · Esquerda (ativo)', 'Cérebro · Esquerda (ativo)'], 'Virada para a direita': ['Rotina · Direita (passivo)', 'Cérebro · Direita (passivo)'] };
+  encherSelect($('c-rotina'), Object.keys(SETA_SUP));
+  /* As setas de baixo: à esquerda a forma de pedir, à direita o teu papel (virada para a esquerda = específico / ativo) */
+  var SETAS_INF = [['c-manif1', 'manif1', { 'Virada para a esquerda': 'Específico', 'Virada para a direita': 'Inespecífico' }], ['c-manif2', 'manif2', { 'Virada para a esquerda': 'Ativo', 'Virada para a direita': 'Inativo (recetivo)' }]];
+  SETAS_INF.forEach(function (f) {
+    encherSelect($(f[0]), Object.keys(f[2]));
+    $(f[0]).addEventListener('change', function (e) { cartao()[f[1]] = f[2][e.target.value] || ''; guardar(); pintarMapa(); });
+  });
+  $('c-rotina').addEventListener('change', function (e) { var c = cartao(); var v = SETA_SUP[e.target.value]; c.rotina_seta = v ? v[0] : ''; c.cerebro = v ? v[1] : ''; guardar(); pintarMapa(); });
+
+  var centrosEl = $('c-centros');
+  CENTROS.forEach(function (nome) {
+    var linha = document.createElement('div'); linha.className = 'centro';
+    var s = document.createElement('span'); s.textContent = nome; linha.appendChild(s);
+    var seg = document.createElement('div'); seg.className = 'seg'; seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', nome);
+    ['Definido', 'Aberto'].forEach(function (estadoC) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = estadoC; b.dataset.centro = nome; b.dataset.valor = estadoC;
+      b.addEventListener('click', function () {
+        var c = cartao();
+        c.centros[nome] = (c.centros[nome] === estadoC) ? '' : estadoC;
+        if (nome === 'Plexo Solar' && c.centros[nome]) c.emocional = c.centros[nome] === 'Definido' ? 'Emocional' : 'Não-Emocional';
+        guardar(); pintarCartao(); pintarMapa();
+      });
+      seg.appendChild(b);
+    });
+    linha.appendChild(seg);
+    centrosEl.appendChild(linha);
+  });
+
+  function pintarPessoas() {
+    var sel = $('pessoa'); sel.innerHTML = '';
+    Object.keys(estado.pessoas).forEach(function (id, i) {
+      var o = document.createElement('option'); o.value = id;
+      o.textContent = estado.pessoas[id].nome || ('Cartão ' + (i + 1));
+      if (id === estado.atual) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  function pintarCartao() {
+    var c = cartao();
+    $('c-nome').value = c.nome;
+    $('c-tipo').value = c.tipo; $('c-autoridade').value = c.autoridade; $('c-perfil').value = c.perfil; $('c-emocional').value = c.emocional;
+    CAMPOS_V.forEach(function (f) { $(f[0]).value = c[f[1]] || ''; });
+    $('c-canais').checked = !!c.canais;
+    SETAS_INF.forEach(function (f) { var dir = ''; Object.keys(f[2]).forEach(function (d) { if (f[2][d] === c[f[1]]) dir = d; }); $(f[0]).value = dir; });
+    $('c-rotina').value = c.rotina_seta ? (c.rotina_seta.indexOf('Esquerda') > -1 ? 'Virada para a esquerda' : 'Virada para a direita') : '';
+    Array.prototype.forEach.call(centrosEl.querySelectorAll('button'), function (b) {
+      b.setAttribute('aria-pressed', c.centros[b.dataset.centro] === b.dataset.valor ? 'true' : 'false');
+    });
+    pintarPessoas();
+  }
+
+  var avisoT = null;
+  function guardar() {
+    var ok = gravar();
+    var el = $('guardado');
+    el.textContent = ok ? 'Guardado neste telemóvel.' : 'Neste navegador não consigo guardar: o cartão fica só enquanto a página estiver aberta.';
+    clearTimeout(avisoT); avisoT = setTimeout(function () { el.textContent = ''; }, 2500);
+  }
+
+  [['c-nome', 'nome']].forEach(function (p) {
+    $(p[0]).addEventListener('change', function (e) { cartao()[p[1]] = e.target.value; guardar(); pintarPessoas(); pintarMapa(); });
+  });
+  CAMPOS_V.forEach(function (f) { $(f[0]).addEventListener('change', function (e) { cartao()[f[1]] = e.target.value; guardar(); pintarMapa(); }); });
+  $('c-canais').addEventListener('change', function (e) { cartao().canais = e.target.checked; guardar(); pintarMapa(); });
+  [['c-tipo', 'tipo'], ['c-autoridade', 'autoridade'], ['c-perfil', 'perfil'], ['c-emocional', 'emocional']].forEach(function (p) {
+    $(p[0]).addEventListener('change', function (e) {
+      var c = cartao(); c[p[1]] = e.target.value;
+      if (p[1] === 'emocional' && c.emocional) c.centros['Plexo Solar'] = c.emocional === 'Emocional' ? 'Definido' : 'Aberto';
+      if (p[1] === 'autoridade' && c.autoridade === 'Emocional (Plexo Solar)') { c.emocional = 'Emocional'; c.centros['Plexo Solar'] = 'Definido'; }
+      guardar(); pintarCartao(); pintarMapa();
+    });
+  });
+  $('pessoa').addEventListener('change', function (e) { estado.atual = e.target.value; guardar(); pintarCartao(); pintarMapa(); });
+  $('nova-pessoa').addEventListener('click', function () {
+    var id = 'p' + Date.now(); estado.pessoas[id] = cartaoVazio(); estado.atual = id;
+    guardar(); pintarCartao(); pintarMapa(); $('c-nome').focus();
+  });
+
+  /* ---------- CONSTRUIR O MAPA ---------- */
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  var CAMPOS = ['Corpo', 'Família', 'Marca'];
+  var NOME_CAMPO = { 'Corpo': 'Corpo', 'Família': 'Projeto Família', 'Marca': 'Marca' };
+  function rotinaDe(c) { if (!c.rotina) c.rotina = {}; return c.rotina; }
+  function aplicacoes(caixa, dado, corpo, familia, marca, perda) {
+    var c = cartao(); var rot = rotinaDe(c);
+    var linhasA = [['Corpo', corpo, 'Corpo'], ['Família', familia, 'Família'], ['Marca', marca, 'Marca']];
+    if (perda) linhasA.push(['Perda de Peso', perda, 'Corpo']);
+    linhasA.forEach(function (a) {
+      var l = el('div', 'aplic'); l.appendChild(el('b', null, a[0]));
+      var txt = el('div', 'aplic-txt'); txt.appendChild(el('span', null, a[1]));
+      var id = dado + ' | ' + a[0];
+      var m = el('div', 'momentos');
+      var b = el('button', null, ''); b.type = 'button';
+      function marcar(sim) { b.setAttribute('aria-pressed', sim ? 'true' : 'false'); b.textContent = sim ? '✓ Na minha rotina' : 'Escolho este gesto'; }
+      marcar(!!rot[id]);
+      b.addEventListener('click', function () {
+        var r = rotinaDe(cartao());
+        if (r[id]) delete r[id]; else r[id] = { quando: Date.now(), texto: a[1], campo: a[2], dado: a[0] === 'Perda de Peso' ? dado + ' · Perda de Peso' : dado };
+        marcar(!!r[id]); guardar(); pintarRotina();
+      });
+      m.appendChild(b);
+      txt.appendChild(m); l.appendChild(txt); caixa.appendChild(l);
+    });
+  }
+  function botaoGesto(id, texto, campo, dadoTxt) {
+    var rot = rotinaDe(cartao());
+    var m = el('div', 'momentos');
+    var b = el('button', null, ''); b.type = 'button';
+    function marcar(sim) { b.setAttribute('aria-pressed', sim ? 'true' : 'false'); b.textContent = sim ? '\u2713 Na minha rotina' : 'Escolho este gesto'; }
+    marcar(!!rot[id]);
+    b.addEventListener('click', function () {
+      var r = rotinaDe(cartao());
+      if (r[id]) delete r[id]; else r[id] = { quando: Date.now(), texto: texto, campo: campo, dado: dadoTxt };
+      marcar(!!r[id]); guardar(); pintarRotina();
+    });
+    m.appendChild(b); return m;
+  }
+  /* bloco livre: linhas = [[r\u00f3tulo, texto, campo ou null]] */
+  function blocoLivre(dado, significado, linhas, idBase, extra) {
+    var caixa = el('div', 'linha-tua');
+    var d = el('div', 'dado', dado); if (extra) d.appendChild(extra); caixa.appendChild(d);
+    if (significado) caixa.appendChild(el('p', 'significado', significado));
+    linhas.forEach(function (a) {
+      var l = el('div', 'aplic'); l.appendChild(el('b', null, a[0]));
+      var txt = el('div', 'aplic-txt'); txt.appendChild(el('span', null, a[1]));
+      if (a[2]) txt.appendChild(botaoGesto(idBase + ' | ' + a[0], a[1], a[2], idBase));
+      l.appendChild(txt); caixa.appendChild(l);
+    });
+    return caixa;
+  }
+  function blocoLinha(dado, linha) {
+    var caixa = el('div', 'linha-tua');
+    caixa.appendChild(el('div', 'dado', dado));
+    caixa.appendChild(el('p', 'significado', linha[0]));
+    aplicacoes(caixa, dado, linha[1], linha[2], linha[3], linha[4]);
+    return caixa;
+  }
+  function idsPorCampo(rot, campo) {
+    var ids = Object.keys(rot).filter(function (id) { return rot[id].campo === campo; });
+    return ids.map(function (id, i) { return [id, rot[id].quando || i]; }).sort(function (x, y) { return x[1] - y[1]; }).map(function (x) { return x[0]; });
+  }
+  function pintarContador() {
+    var rot = rotinaDe(cartao());
+    var txt = CAMPOS.map(function (campo) { return NOME_CAMPO[campo] + ' ' + idsPorCampo(rot, campo).length; }).join(' \u00b7 ');
+    Array.prototype.forEach.call(document.querySelectorAll('.conta-gestos'), function (e) { e.textContent = 'Gestos escolhidos \u00b7 ' + txt; });
+  }
+  function pintarRotina() {
+    pintarContador();
+    var c = cartao(); var rot = rotinaDe(c); var corpo = $('rotina-corpo'); corpo.innerHTML = '';
+    CAMPOS.forEach(function (campo) {
+      var bloco = el('div', 'momento');
+      bloco.appendChild(el('h3', null, NOME_CAMPO[campo]));
+      var ids = Object.keys(rot).filter(function (id) { return rot[id].campo === campo; });
+      if (!ids.length) bloco.appendChild(el('p', 'vazio-m', 'Ainda sem gestos. Escolhe-os nas camadas do mapa, na linha ' + campo + '.'));
+      ids.forEach(function (id) {
+        var g = rot[id]; var linha = el('div', 'gesto');
+        var p = el('p', null, g.texto); p.appendChild(el('small', null, g.dado)); linha.appendChild(p);
+        var x = el('button', null, '×'); x.type = 'button'; x.setAttribute('aria-label', 'Tirar da rotina: ' + g.texto);
+        x.addEventListener('click', function () {
+          delete rotinaDe(cartao())[id];
+          guardar(); pintarMapa();
+        });
+        linha.appendChild(x); bloco.appendChild(linha);
+      });
+      corpo.appendChild(bloco);
+    });
+  }
+  function outras(linhas, atual) {
+    var d = el('details', 'outras'); d.appendChild(el('summary', null, 'Ver as outras linhas'));
+    var l = el('div', 'lista-outras');
+    Object.keys(linhas).forEach(function (k) {
+      if (k === atual) return;
+      var o = el('div', 'o'); o.appendChild(el('strong', null, linhas[k][0])); o.appendChild(document.createTextNode(linhas[k][1])); l.appendChild(o);
+    });
+    d.appendChild(l); return d;
+  }
+
+  var FALTA = { vitTipo: 'Escolhe o teu tipo de energia no cartão.', vitAut: 'Escolhe a tua autoridade no cartão.', digestao: 'Escolhe o teu tipo de digestão no cartão.', ambiente: 'Escolhe o teu tipo de ambiente no cartão.', sentido: 'Escolhe o teu sentido mais forte no cartão.', rotina: 'Escolhe no cartão para onde está virada a seta de cima à esquerda.', manifestacao: 'Escolhe no cartão para onde estão viradas as duas setas de baixo.', exercicio: 'Escolhe o teu tipo e marca o centro Raiz no cartão.' };
+  function valorDe(c, chave) {
+    if (chave === 'raiz') return c.centros['Raiz'] === 'Definido' ? 'Centro Raiz Definido' : (c.centros['Raiz'] === 'Aberto' ? 'Centro Raiz Indefinido' : '');
+    if (chave === 'canais') return c.canais ? 'Canais entre Baço e Raiz (qualquer um definido)' : '';
+    if (chave === 'rotina') return c.rotina_seta;
+    return c[chave];
+  }
+  function pintarMapa() {
+    pintarRotina();
+    if (typeof FAM !== 'undefined') pintarFamilia();
+    var c = cartao(); var corpo = $('mapa-corpo'); corpo.innerHTML = '';
+    var preenchido = c.tipo || c.autoridade || c.perfil || c.emocional || Object.keys(c.centros).some(function (k) { return c.centros[k]; });
+    if (!preenchido) {
+      corpo.appendChild(el('p', 'vazio', 'Escolhe o teu tipo de energia no cartão e as tuas linhas aparecem aqui, camada a camada. Podes começar só pelo tipo.'));
+    }
+    ORDEM.forEach(function (k) {
+      if (k.charAt(0) === '#') { corpo.appendChild(el('h3', 'grupo-mapa', k.slice(1))); return; }
+      if (k.charAt(0) === '@') { var sub = el('div', 'em-breve'); sub.appendChild(el('h3', null, k.slice(1))); sub.appendChild(el('p', null, 'Como o teu corpo se nutre, se move e descansa. A coluna Perda de Peso aponta sempre para o alinhamento e o ritmo, nunca para a privação.')); corpo.appendChild(sub); return; }
+      if (k.charAt(0) === '~') { var eb = el('div', 'em-breve'); eb.appendChild(el('h3', null, k.slice(1))); eb.appendChild(el('p', null, 'Esta camada entra no guia em breve.')); corpo.appendChild(eb); return; }
+      var sec = el('div', 'camada');
+      if (k === 'CENTROS') {
+        var cab = el('div', 'camada-cab'); cab.appendChild(el('h3', null, 'Centros Energéticos'));
+        cab.appendChild(el('p', null, 'como a tua inteligência funciona, e onde és influenciável. Percorre os nove centros e lê, em cada um, a metade que é a tua'));
+        sec.appendChild(cab);
+        var lista = el('div', 'centros-tua'); var algum = false;
+        CENTROS.forEach(function (nome) {
+          var v = c.centros[nome]; if (!v) return; algum = true;
+          var chave = nome + ' · ' + v;
+          lista.appendChild(blocoLinha(chave, C[chave]));
+        });
+        if (!algum) lista.appendChild(el('p', 'falta', 'Marca no cartão, para cada centro, se é definido ou aberto.'));
+        else if (CENTROS.some(function (n) { return !c.centros[n]; })) lista.appendChild(el('p', 'falta', 'Faltam centros por marcar no cartão.'));
+        sec.appendChild(lista);
+        corpo.appendChild(sec); return;
+      }
+      var tab = T[k];
+      var cab2 = el('div', 'camada-cab'); cab2.appendChild(el('h3', null, tab.titulo)); cab2.appendChild(el('p', null, tab.sub)); sec.appendChild(cab2);
+      if (tab.multi) {
+        var algumM = false; var todas = {};
+        tab.multi.forEach(function (par) {
+          var v = valorDe(c, par[0]); Object.keys(par[1]).forEach(function (kk) { todas[kk] = par[1][kk]; });
+          if (v && par[1][v]) { algumM = true; sec.appendChild(blocoLinha(par[1][v][0], par[1][v].slice(1))); }
+        });
+        if (!algumM) sec.appendChild(el('p', 'falta', FALTA[k] || 'Preenche este dado no cartão.'));
+        sec.appendChild(outras(todas, null));
+        corpo.appendChild(sec); return;
+      }
+      var valor = c[tab.chave];
+      var linha = valor ? tab.linhas[valor] : null;
+      if (linha) {
+        sec.appendChild(blocoLinha(linha[0], linha.slice(1)));
+      } else {
+        var falta = { tipo: 'Escolhe o teu tipo de energia no cartão.', autoridade: 'Escolhe a tua autoridade no cartão.', perfil: 'Escolhe o teu perfil no cartão.', emocional: 'Escolhe o teu tipo emocional no cartão.' };
+        sec.appendChild(el('p', 'falta', FALTA[k] || falta[tab.chave] || 'Preenche este dado no cartão.'));
+      }
+      sec.appendChild(outras(tab.linhas, valor));
+      corpo.appendChild(sec);
+    });
+  }
+
+  /* ---------- LEITOR DE ÁUDIO ---------- */
+  var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+  var PAUSA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+  var tocar = null;
+  function mmss(s) { if (!isFinite(s)) return ''; s = Math.round(s); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+
+  Object.keys(AUDIOS).forEach(function (grupo) {
+    var caixa = document.querySelector('.audios[data-grupo="' + grupo + '"]');
+    AUDIOS[grupo].forEach(function (a) {
+      var linha = el('div', 'audio');
+      var b = el('button', 'play'); b.type = 'button'; b.innerHTML = PLAY; b.setAttribute('aria-label', 'Ouvir: ' + a.nome);
+      var info = el('div', 'audio-info');
+      info.appendChild(el('div', 'audio-nome', a.nome));
+      if (a.desc) info.appendChild(el('p', 'audio-desc', a.desc));
+      var prog = el('div', 'progresso'); var barra = el('span'); prog.appendChild(barra); info.appendChild(prog);
+      var tempo = el('div', 'audio-tempo', ''); info.appendChild(tempo);
+      linha.appendChild(b); linha.appendChild(info); caixa.appendChild(linha);
+
+      var audio = new Audio(); audio.preload = 'none'; audio.src = a.ficheiro;
+      var semFicheiro = false;
+      function marcarFora() {
+        if (semFicheiro) return; semFicheiro = true;
+        prog.hidden = true;
+        tempo.className = 'audio-fora';
+        tempo.innerHTML = '';
+        var link = document.createElement('a'); link.href = a.drive; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Abrir no Drive';
+        tempo.appendChild(document.createTextNode('Este áudio ainda não está no guia. ')); tempo.appendChild(link);
+      }
+      audio.addEventListener('error', function () { b.dataset.estado = ''; b.innerHTML = PLAY; marcarFora(); });
+      audio.addEventListener('loadedmetadata', function () { tempo.textContent = '0:00 / ' + mmss(audio.duration); });
+      audio.addEventListener('timeupdate', function () {
+        if (audio.duration) { barra.style.width = (audio.currentTime / audio.duration * 100) + '%'; tempo.textContent = mmss(audio.currentTime) + ' / ' + mmss(audio.duration); }
+      });
+      audio.addEventListener('ended', function () { b.dataset.estado = ''; b.innerHTML = PLAY; });
+      b.addEventListener('click', function () {
+        if (semFicheiro) { window.open(a.drive, '_blank', 'noopener'); return; }
+        if (b.dataset.estado === 'a-tocar') { audio.pause(); b.dataset.estado = ''; b.innerHTML = PLAY; return; }
+        if (tocar && tocar.audio !== audio) { tocar.audio.pause(); tocar.b.dataset.estado = ''; tocar.b.innerHTML = PLAY; }
+        tocar = { audio: audio, b: b };
+        b.dataset.estado = 'a-tocar'; b.innerHTML = PAUSA; b.setAttribute('aria-label', 'Pausa: ' + a.nome);
+        var p = audio.play(); if (p && p.catch) p.catch(function () { b.dataset.estado = ''; b.innerHTML = PLAY; marcarFora(); });
+      });
+      /* verifica, sem descarregar o áudio, se o ficheiro já está junto ao guia */
+      try { fetch(a.ficheiro, { method: 'HEAD' }).then(function (r) { if (!r.ok) marcarFora(); }).catch(function () { marcarFora(); }); } catch (e) { marcarFora(); }
+    });
+  });
+
+  /* ---------- OS MEUS RITUAIS EM PDF ---------- */
+  function limpo(t) {
+    return String(t || '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, '...').replace(/[–—]/g, '-').replace(/[^\x00-\xFF]/g, '');
+  }
+  function linhasDoCartao(c) {
+    var out = [];
+    ORDEM.forEach(function (k) {
+      if (k.charAt(0) === '#' || k.charAt(0) === '~' || k.charAt(0) === '@' || (T[k] && T[k].multi)) return;
+      if (k === 'CENTROS') {
+        var cs = CENTROS.filter(function (n) { return c.centros[n]; });
+        if (cs.length) out.push({ titulo: 'Centros Energéticos', itens: cs.map(function (n) { var ch = n + ' · ' + c.centros[n]; return { dado: ch, l: C[ch] }; }) });
+        return;
+      }
+      var tab = T[k]; var v = c[tab.chave]; var l = v ? tab.linhas[v] : null;
+      if (l) out.push({ titulo: tab.titulo, itens: [{ dado: l[0], l: l.slice(1) }] });
+    });
+    return out;
+  }
+
+  function criarPDF(c) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    var W = 210, H = 297, M = 18, larg = W - 2 * M, y = 0;
+    var BORDO = [92, 36, 52], TEXTO = [74, 48, 64], SUAVE = [138, 100, 116], CREME = [245, 237, 228], LINHA = [222, 205, 192];
+    function fundo() { doc.setFillColor.apply(doc, CREME); doc.rect(0, 0, W, H, 'F'); }
+    function rodape() {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, SUAVE);
+      doc.text(limpo('Rituals · #Docaraças · Embodiement by Design · Rita Silva Soares'), W / 2, H - 9, { align: 'center' });
+    }
+    function novaPagina() { rodape(); doc.addPage(); fundo(); y = M; }
+    function cabe(h) { if (y + h > H - 18) novaPagina(); }
+    function escrever(txt, fonte, estilo, tam, cor, recuo, entre) {
+      doc.setFont(fonte, estilo); doc.setFontSize(tam); doc.setTextColor.apply(doc, cor);
+      var linhas = doc.splitTextToSize(limpo(txt), larg - (recuo || 0));
+      var alt = tam * 0.42;
+      linhas.forEach(function (ln) { cabe(alt); doc.text(ln, M + (recuo || 0), y); y += alt; });
+      y += (entre == null ? 1.5 : entre);
+    }
+    function regua() { doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 11; }
+
+    fundo();
+    doc.setFillColor.apply(doc, BORDO); doc.rect(0, 0, W, 46, 'F');
+    doc.setTextColor.apply(doc, CREME);
+    doc.setFont('times', 'italic'); doc.setFontSize(34); doc.text('Rituals', M, 24);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+    doc.text(limpo('OS MEUS RITUAIS' + (c.nome ? ' · ' + c.nome.toUpperCase() : '')), M, 33);
+    doc.setFontSize(8.5);
+    var hoje = new Date();
+    doc.text(limpo('Criado a ' + ('0' + hoje.getDate()).slice(-2) + '-' + ('0' + (hoje.getMonth() + 1)).slice(-2) + '-' + hoje.getFullYear()), M, 39);
+    var resumo = [c.tipo, c.autoridade, c.perfil].filter(Boolean).join(' \u00b7 ');
+    if (resumo) { doc.setFontSize(9.5); doc.text(limpo(resumo), W - M, 33, { align: 'right' }); }
+    y = 60;
+
+    /* Os meus gestos deste mês: o primeiro escolhido em cada área, em grande */
+    var rot = rotinaDe(c); var destaque = {};
+    var primeiros = CAMPOS.map(function (campo) { var id = idsPorCampo(rot, campo)[0]; if (id) destaque[id] = true; return [campo, id]; }).filter(function (x) { return x[1]; });
+    if (primeiros.length) {
+      escrever('Os meus gestos deste mês', 'times', 'italic', 24, BORDO, 0, 4);
+      primeiros.forEach(function (x) {
+        var g = rot[x[1]];
+        cabe(18);
+        escrever(NOME_CAMPO[x[0]].toUpperCase(), 'helvetica', 'bold', 8.5, BORDO, 0, 3.5);
+        escrever(g.texto, 'times', 'italic', 16, [31, 20, 24], 0, 1);
+        escrever(g.dado, 'helvetica', 'normal', 8, SUAVE, 0, 5);
+      });
+      y += 2;
+    }
+
+    var outros = CAMPOS.map(function (campo) { return [campo, idsPorCampo(rot, campo).filter(function (id) { return !destaque[id]; })]; }).filter(function (x) { return x[1].length; });
+    if (outros.length) {
+      cabe(20); regua();
+      escrever('Os outros gestos', 'times', 'italic', 18, BORDO, 0, 3);
+      outros.forEach(function (x) {
+        cabe(12);
+        escrever(NOME_CAMPO[x[0]], 'times', 'bolditalic', 12, BORDO, 0, 1.2);
+        x[1].forEach(function (id) {
+          var g = rot[id];
+          cabe(8);
+          doc.setFillColor.apply(doc, BORDO); doc.circle(M + 1.2, y - 1.1, 0.6, 'F');
+          escrever(g.texto, 'helvetica', 'normal', 9, [31, 20, 24], 4, 0.4);
+          escrever(g.dado, 'helvetica', 'normal', 7, SUAVE, 4, 2);
+        });
+        y += 1.5;
+      });
+    }
+    if (!primeiros.length) escrever('Escolhe os teus gestos no guia, em "Escolho este gesto", e cria o PDF outra vez.', 'helvetica', 'italic', 9.5, SUAVE, 0, 3);
+
+    /* O meu cartão */
+    y += 2; if (y > 62) { cabe(20); regua(); }
+    escrever('O meu cartão', 'times', 'italic', 22, BORDO, 0, 3);
+    var dadosCartao = [];
+    if (c.tipo) {
+      dadosCartao.push(['Tipo de energia', c.tipo]);
+      dadosCartao.push(['Estratégia', T.estrategia.linhas[c.tipo][0]]);
+      dadosCartao.push(['Assinatura', T.assinatura.linhas[c.tipo][0]]);
+      dadosCartao.push(['Tema / Não-Eu', T.tema.linhas[c.tipo][0]]);
+    }
+    if (c.autoridade) dadosCartao.push(['Autoridade', c.autoridade]);
+    if (c.perfil) dadosCartao.push(['Perfil', T.perfil.linhas[c.perfil][0]]);
+    if (c.emocional) dadosCartao.push(['Tipo emocional', c.emocional]);
+    var defs = CENTROS.filter(function (n) { return c.centros[n] === 'Definido'; });
+    var abs = CENTROS.filter(function (n) { return c.centros[n] === 'Aberto'; });
+    if (defs.length) dadosCartao.push(['Centros definidos', defs.join(' · ')]);
+    if (abs.length) dadosCartao.push(['Centros abertos', abs.join(' · ')]);
+    if (c.manif1 || c.manif2) dadosCartao.push(['Manifestação', [c.manif1, c.manif2].filter(Boolean).join(' · ')]);
+    if (c.digestao) dadosCartao.push(['Tipo de digestão', c.digestao]);
+    if (c.sentido) dadosCartao.push(['Sentido mais forte', c.sentido]);
+    if (c.ambiente) dadosCartao.push(['Tipo de ambiente', c.ambiente]);
+    if (c.rotina_seta || c.cerebro) dadosCartao.push(['Rotina', [c.rotina_seta, c.cerebro].filter(Boolean).join(' · ')]);
+    var opP = opcoesDe(c);
+    if (opP.filhos) c.filhos.forEach(function (f, i) { dadosCartao.push(['Crian\u00e7a', [f.nome || ('Filho ' + (i + 1)), f.tipo, f.emocional ? 'Centro emocional ' + f.emocional.toLowerCase() : ''].filter(Boolean).join(' · ')]); });
+    if (opP.bebes) c.bebes.forEach(function (b, i) { var ab = Object.keys(b.abertos || {}).filter(function (k) { return b.abertos[k]; }); dadosCartao.push(['Rec\u00e9m-nascido', [b.nome || ('Beb\u00e9 ' + (i + 1)), b.tipo, ab.length ? 'abertos: ' + ab.join(', ') : ''].filter(Boolean).join(' · ')]); });
+    if (opP.lua || opP.menstrual) dadosCartao.push(['Ciclos', [opP.lua ? 'Lunar' : '', opP.menstrual ? 'Menstrual' : ''].filter(Boolean).join(' · ')]);
+    dadosCartao.forEach(function (d) {
+      cabe(7);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, SUAVE);
+      doc.text(limpo(d[0].toUpperCase()), M, y);
+      var y0 = y;
+      escrever(d[1], 'helvetica', 'normal', 10, [31, 20, 24], 42, 1.4);
+      if (y < y0 + 5) y = y0 + 5;
+    });
+    y += 4;
+
+
+    /* E agora? */
+    y += 4; cabe(40); regua();
+    escrever('E agora?', 'times', 'italic', 22, BORDO, 0, 3);
+    escrever('Agora vives. Vai devagar, uma camada de cada vez, e deixa o corpo integrar o que a mente já sabe. Volta às tabelas sempre que precisares: o teu mapa não muda, mas a tua relação com ele aprofunda-se.', 'helvetica', 'normal', 10.5, TEXTO, 0, 3);
+    escrever('Porque nada menos do que tudo é T-U-D-O.', 'times', 'italic', 13, [31, 20, 24], 0, 2);
+    escrever('Um xiii, Rita', 'times', 'italic', 14, BORDO, 0, 2);
+
+    rodape();
+    var total = doc.getNumberOfPages();
+    for (var i = 1; i <= total; i++) {
+      doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, SUAVE);
+      doc.text(i + ' / ' + total, W - M, H - 9, { align: 'right' });
+    }
+    return doc;
+  }
+
+  var botaoPDF = $('gerar-pdf'); var estadoPDF = $('pdf-estado');
+  var downloadsP = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(function () { return null; }) : Promise.resolve(null);
+  botaoPDF.addEventListener('click', function () {
+    if (!window.jspdf) { estadoPDF.textContent = 'O criador de PDF ainda não carregou. Espera um instante e toca outra vez.'; return; }
+    var c = cartao();
+    if (!Object.keys(rotinaDe(c)).length) { estadoPDF.textContent = 'Primeiro escolhe os teus gestos nas camadas do mapa, em "Escolho este gesto".'; return; }
+    var doc = criarPDF(c);
+    var nome = 'Os meus rituais' + (c.nome ? ' · ' + c.nome : '') + '.pdf';
+    botaoPDF.disabled = true; estadoPDF.textContent = 'A preparar o teu PDF…';
+    downloadsP.then(function (dl) {
+      if (dl) {
+        return dl.save({ filename: nome, data: doc.output('blob') }).then(function () {
+          estadoPDF.textContent = 'O teu PDF está guardado. 🌸';
+        }, function (e) {
+          estadoPDF.textContent = (e && e.code === 'declined') ? 'Ficou por guardar. Quando quiseres, toca outra vez.' : 'Aqui não consegui guardar o PDF. Tenta outra vez daqui a um momento.';
+        });
+      }
+      if (window.self === window.top) { doc.save(nome); estadoPDF.textContent = 'O teu PDF está a descarregar. 🌸'; return; }
+      estadoPDF.textContent = 'Aqui não consigo guardar ficheiros.';
+    }).then(function () { botaoPDF.disabled = false; });
+  });
+
+  /* ---------- CRIAN\u00c7AS, REC\u00c9M-NASCIDOS E CICLOS (texto do guia, tal como est\u00e1) ---------- */
+  var FAM = {"criTipo": {"Manifestadora": ["Manifestadora", "Espírito livre e alquímico. Sente cedo a sua força e precisa de liberdade para iniciar, decidir e explorar.", "Ensina-a a pedir permissão antes de agir (a versão-criança do informar) e autoriza sempre que for seguro. O controlo a mais gera rebeldia ou apatia. Cria um espaço onde a verdade é ouvida sem crítica.", "Avisa-a da rotina antes de dormir: saber o que vem a seguir acalma-a, e deita-a antes do esgotamento.", "Gosta de ser informada do que vai acontecer: sente-se respeitada. Mostra-lhe, com exemplos reais, o impacto que tem nos outros. Dá-lhe um espaço de paz só seu."], "Geradora": ["Geradora", "Tecido vital e criativo. Está aqui para gerar e criar todos os dias, no que a ilumina.", "Não a mandes gastar energia ao calhas: mostra-lhe coisas e observa ao que ela responde. Não te desiludas se não iniciar, ela reage ao que lhe pões à frente. Usa perguntas de sim ou não e aprende a ler a resposta do corpo dela.", "Deixa-a gastar a energia do dia antes de dormir (brincar, dançar, desenhar). A hora de dormir chega quando a bateria se esgota, não pelo relógio. Se adormecer a brincar, tudo bem.", "Acolhe os sons sacrais (grunhidos, aha) como resposta legítima. Não a obrigues a justificar tudo por palavras."], "Geradora Manifestante": ["Geradora Manifestante", "Como a Geradora, com mais velocidade e multi-paixões. Fogo criativo que salta entre interesses.", "Combina o responder da Geradora com o pedir-permissão da Manifestadora. Observa o que a acende e deixa-a variar e saltar, é o desenho dela.", "Pode ir para a cama e ainda brincar e criar até adormecer. Deixa-a descarregar até ao fim.", "Lê as respostas do corpo e avisa-a das mudanças: ela precisa de margem para os seus saltos."], "Projetora": ["Projetora", "Um geodo de cristal: absorve tudo à volta, sobretudo nos primeiros sete anos. Um brilho que toca muitas vidas.", "Cuida da qualidade das energias à volta dela (a tua incluída). Ensina-lhe cedo o que é o reconhecimento certo e o convite correto. Dá-lhe sistemas para estudar: ela adora compreender como as coisas funcionam.", "Precisa de pausas e de tempo de integração. O parar e observar é descanso, não preguiça.", "Interação um-para-um e tempo a sós. A observação é a sua brincadeira preferida: respeita os seus silêncios, sem a forçares a falar."], "Refletora": ["Refletora", "Brilho misterioso e sabedoria única. É um espelho do ambiente: prova o todo.", "Sem pressão. Deixa-a desenvolver-se ao seu ritmo, que o tempo para ela é sagrado. Não a forces a fixar ideias nem a responder na hora. Deixa fluir.", "Ritmo de sono próprio e rotina suave, sem te guiares por médias ou por outras crianças.", "A inconsistência é dom, não falha: não lhe cobres consistência. Investe no ambiente como num templo (aroma, decoração, estrelinhas no teto) e experimenta lugares até ela encontrar os seus. Muitas vezes, o que precisa de mudar é o ambiente, não a criança."]}, "criEmo": {"Definido": ["Plexo Solar Definido (emocional)", "As decisões importantes dela nascem da clareza que vem com o tempo, não no calor do momento. Ajuda-a a reconhecer a onda, sem rotular emoções de boas ou más e sem exigir porquês. Dá-lhe tempo antes de grandes desejos e decisões."], "Indefinido": ["Plexo Solar Indefinido (não-emocional)", "Não tem onda própria: absorve e amplia as emoções à volta. Ajuda-a a perceber que nem toda a emoção que sente é dela. Um ambiente calmo regula-a."]}, "bebSono": {"Manifestadora": ["Manifestadora", "Energia em impulsos: adormece quando a onda baixa, não pelo relógio.", "Deita-o antes da exaustão. Um ritual suave e luz baixa acalmam-no, e saber o que vem a seguir dá-lhe segurança."], "Geradora": ["Geradora", "Precisa de gastar a energia do dia antes de adormecer.", "Deixa-o gastar-se a mexer e a brincar. O sono chega quando a bateria se esgota. Se adormecer a brincar, tudo bem: leva-o ao colo para a cama."], "Geradora Manifestante": ["Geradora Manifestante", "Como a Geradora, com ainda mais energia para descarregar.", "Pode ir para o berço e ainda mexer-se até adormecer. Deixa-o descarregar até ao fim."], "Projetora": ["Projetora", "Não foi feito para aguentar até à exaustão: cansa-se por dentro antes de o mostrar.", "A regra de ouro é deitar antes de esgotado. Cria um descer suave uma a duas horas antes, deixa-o desligar devagar e acordar devagar. Sestas sempre que precisar."], "Refletora": ["Refletora", "Ritmo de sono muito próprio, que varia com o ambiente e o dia.", "Rotina suave e com margem, sem te guiares por médias nem por outros bebés. O ambiente certo é o que o adormece."]}, "bebCentro": {"Cabeça": ["Cabeça", "A pressão mental e as preocupações de quem o rodeia.", "Um adulto sereno acalma a cabecinha dele: ambiente mental calmo."], "Ajna": ["Ajna", "Várias formas de pensar; a mente é fluida, não fixa.", "Não sobrecarregues de estímulo; dá-lhe tempo e quietude."], "Garganta": ["Garganta", "A pressão para se expressar no tempo dos outros. Tem flexibilidade metabólica.", "Respeita o seu tempo. O crescimento é não-linear: de repente dá um salto, e um dia acordas e ele cresceu imenso."], "G / Self": ["G / Self", "O lugar e a energia à volta: para ele, os lugares são muito importantes.", "Como o berço é o seu mundo agora, investe nos detalhes: um móbile, um ninho, o aroma, os lençóis."], "Coração / Ego": ["Coração / Ego", "A pressão de corresponder ou de provar.", "Amor incondicional, sem exigir desempenho. O valor dele não se ganha."], "Plexo Solar": ["Plexo Solar", "Absorve e amplia as emoções da casa: sente o clima antes de tudo.", "Não o culpes pelo que sente: é uma emoção que só o atravessa. Quando estiveres em estados que o perturbam, afasta-te também, para não somar ao caos. Dá-lhe momentos de sacudir as emoções (passeios, pés descalços, banho)."], "Sacral": ["Sacral", "Não tem energia constante: oscila, cansa e recupera de forma irregular.", "Precisa de tempo sozinho na sua própria aura. Sei que é irresistível andar com ele ao colo, mas deixá-lo a dormir ou a brincar sem ninguém colado dá-lhe conforto com a sua natureza oscilante."], "Baço": ["Baço", "O medo e a insegurança do ambiente, e é sensível à saúde.", "Ambiente seguro e tranquilo. Cuida do teu próprio medo, porque ele apanha-o."], "Raiz": ["Raiz", "Absorve e amplia a pressão e a pressa à volta.", "Com ele é slow-tudo! Não o pressiones a comer, a aprender, a dormir. Atenção: essa pressão é muitas vezes inconsciente, e se ele a sente, foca-se nela e não no prazer."]}, "lua": [["Lua Nova", "Começo, semente, escuro fértil. Energia baixa e recolhida.", "Descansa mais, recolhe-te. O corpo pede silêncio e interioridade.", "Um recomeço suave em casa: menos planos, mais presença.", "Planta intenções e ideias, sem as forçar a crescer já."], ["Lua Crescente", "A energia sobe, o impulso de fazer cresce.", "O corpo ganha vigor: bom para iniciar movimento e hábitos.", "Põe em marcha o que se semeou; a casa ganha ritmo.", "Constrói e avança no que plantaste na lua nova."], ["Lua Cheia", "Pico, plenitude, luz máxima. Tudo se ilumina e intensifica.", "Energia e emoções no auge: canaliza, sem decisões no calor do pico.", "Celebra e partilha; as emoções da casa também sobem.", "Mostra, lança, colhe visibilidade. Evita decidir no pico."], ["Lua Minguante", "A energia desce, tempo de soltar e libertar.", "Abranda, larga o que não serve, prepara o descanso.", "Simplifica, arruma, fecha ciclos com a família.", "Revê, ajusta e liberta o que já não serve ao negócio."]], "luaRefletora": ["Refletora", "A tua clareza chega ao longo de um ciclo lunar completo (cerca de 28 dias). Deixa as decisões grandes amadurecer uma lua inteira, conversando-as, antes de te comprometeres. O que sentes muda com as fases, e isso é sabedoria, não inconstância."], "menstrual": [["Menstrual", "Inverno · Planeamento (semear no escuro)", "Descansa a sério. Energia mais baixa, sensibilidade mais alta: menos exigência, mais quietude e calor. É no recolhimento que as sementes e as intenções nascem.", "Baixa o ritmo da casa sem culpa; pede colo e espaço. Sonha em conjunto o que vem a seguir.", "Tempo de escuta interior e de plantar intenções. Sente e planeia, sem produzir ainda."], ["Folicular", "Primavera · Ação", "A energia renasce e pede movimento. O corpo está pronto para iniciar e fazer.", "Põe em marcha os planos; a casa ganha ritmo e frescura.", "Avança, cria, executa o que se semeou no inverno. Mente clara e mãos ativas."], ["Ovulação", "Verão · Expressão e encontro", "Pico de energia, presença e magnetismo. O corpo brilha para fora.", "Mais disponível e luminosa; bom tempo para encontros e partilha.", "Mostra-te, comunica, lança, vende. A tua janela de visibilidade."], ["Lútea", "Outono · Início do recolhimento", "A energia começa a descer. Tempo de concluir, organizar e abrandar.", "Fecha ciclos em casa, simplifica, prepara o inverno que chega.", "Termina o que está a meio, arruma, e começa a soltar o que já não serve."]]};
+  function opcoesDe(c) { if (!c.opcoes) c.opcoes = {}; if (!c.filhos) c.filhos = []; if (!c.bebes) c.bebes = []; return c.opcoes; }
+  function faseDaLua(d) {
+    var dias = (d.getTime() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000;
+    var idade = ((dias % 29.530588853) + 29.530588853) % 29.530588853;
+    if (idade < 3.7 || idade >= 25.8) return 'Lua Nova';
+    if (idade < 11.1) return 'Lua Crescente';
+    if (idade < 18.5) return 'Lua Cheia';
+    return 'Lua Minguante';
+  }
+  function selectSimples(opcoes, valor, rotulo) {
+    var sel = document.createElement('select'); sel.setAttribute('aria-label', rotulo);
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = rotulo + '\u2026'; sel.appendChild(o0);
+    opcoes.forEach(function (v) { var o = document.createElement('option'); o.value = v; o.textContent = v; if (v === valor) o.selected = true; sel.appendChild(o); });
+    return sel;
+  }
+  function campoTexto(valor, rotulo) { var i = document.createElement('input'); i.type = 'text'; i.value = valor || ''; i.placeholder = rotulo; i.setAttribute('aria-label', rotulo); i.autocomplete = 'off'; return i; }
+  function remover(lista, idx) { return function () { lista.splice(idx, 1); guardar(); pintarFamilia(); pintarRotina(); }; }
+
+  function pintarCartoesFamilia() {
+    var c = cartao(); var op = opcoesDe(c);
+    $('o-filhos').checked = !!op.filhos; $('o-bebes').checked = !!op.bebes; $('o-lua').checked = !!op.lua; $('o-menstrual').checked = !!op.menstrual;
+    $('g-filhos').hidden = !op.filhos; $('g-bebes').hidden = !op.bebes;
+    var lf = $('lista-filhos'); lf.innerHTML = '';
+    c.filhos.forEach(function (f, i) {
+      var m = el('div', 'mini'); var topo = el('div', 'mini-topo'); topo.appendChild(el('b', null, f.nome || ('Filho ' + (i + 1))));
+      var x = el('button', 'btn-txt', 'Tirar'); x.type = 'button'; x.addEventListener('click', remover(c.filhos, i)); topo.appendChild(x); m.appendChild(topo);
+      var n = campoTexto(f.nome, 'Nome'); n.addEventListener('change', function () { f.nome = n.value; guardar(); pintarFamilia(); });
+      var t = selectSimples(Object.keys(FAM.criTipo), f.tipo, 'Tipo de energia'); t.addEventListener('change', function () { f.tipo = t.value; guardar(); pintarFamilia(); });
+      var e = selectSimples(['Definido', 'Indefinido'], f.emocional, 'Centro emocional'); e.addEventListener('change', function () { f.emocional = e.value; guardar(); pintarFamilia(); });
+      var cs = el('div', 'campos'); [n, t, e].forEach(function (x2) { var w = el('div', 'campo'); w.appendChild(x2); cs.appendChild(w); }); m.appendChild(cs);
+      lf.appendChild(m);
+    });
+    var lb = $('lista-bebes'); lb.innerHTML = '';
+    c.bebes.forEach(function (b, i) {
+      if (!b.abertos) b.abertos = {};
+      var m = el('div', 'mini'); var topo = el('div', 'mini-topo'); topo.appendChild(el('b', null, b.nome || ('Beb\u00e9 ' + (i + 1))));
+      var x = el('button', 'btn-txt', 'Tirar'); x.type = 'button'; x.addEventListener('click', remover(c.bebes, i)); topo.appendChild(x); m.appendChild(topo);
+      var n = campoTexto(b.nome, 'Nome'); n.addEventListener('change', function () { b.nome = n.value; guardar(); pintarFamilia(); });
+      var t = selectSimples(Object.keys(FAM.bebSono), b.tipo, 'Tipo de energia'); t.addEventListener('change', function () { b.tipo = t.value; guardar(); pintarFamilia(); });
+      var cs = el('div', 'campos'); [n, t].forEach(function (x2) { var w = el('div', 'campo'); w.appendChild(x2); cs.appendChild(w); }); m.appendChild(cs);
+      m.appendChild(el('small', null, 'Centros indefinidos, onde o beb\u00e9 \u00e9 mais sens\u00edvel:'));
+      var mc = el('div', 'mini-centros');
+      Object.keys(FAM.bebCentro).forEach(function (cn) {
+        var lab = document.createElement('label'); var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!b.abertos[cn];
+        cb.addEventListener('change', function () { b.abertos[cn] = cb.checked; guardar(); pintarFamilia(); });
+        lab.appendChild(cb); lab.appendChild(document.createTextNode(cn)); mc.appendChild(lab);
+      });
+      m.appendChild(mc); lb.appendChild(m);
+    });
+  }
+
+  function pintarFamilia() {
+    var c = cartao(); var op = opcoesDe(c);
+    $('criancas').hidden = !op.filhos; $('nav-criancas').hidden = !op.filhos;
+    $('recem-nascidos').hidden = !op.bebes; $('nav-bebes').hidden = !op.bebes;
+    $('ciclos').hidden = !(op.lua || op.menstrual); $('nav-ciclos').hidden = !(op.lua || op.menstrual);
+    pintarCartoesFamilia();
+
+    var cc = $('criancas-corpo'); cc.innerHTML = '';
+    if (!c.filhos.length) cc.appendChild(el('p', 'vazio', 'Junta um filho no cart\u00e3o, com o tipo de energia e o centro emocional, e o mapa dele aparece aqui.'));
+    c.filhos.forEach(function (f, i) {
+      var nome = f.nome || ('Filho ' + (i + 1));
+      cc.appendChild(el('h3', 'pessoa-tit', nome));
+      var sec = el('div', 'camada');
+      var cab = el('div', 'camada-cab'); cab.appendChild(el('h3', null, 'Crian\u00e7as por Tipo')); cab.appendChild(el('p', null, 'como acompanhar o teu filho pelo desenho dele')); sec.appendChild(cab);
+      var r = f.tipo ? FAM.criTipo[f.tipo] : null; var base = nome + ' \u00b7 ' + (f.tipo || '');
+      if (r) sec.appendChild(blocoLivre(r[0], r[1], [['A Chave', r[2], 'Fam\u00edlia'], ['Sono', r[3], 'Fam\u00edlia'], ['Comunica\u00e7\u00e3o e Ambiente', r[4], 'Fam\u00edlia']], base));
+      else sec.appendChild(el('p', 'falta', 'Escolhe o tipo de energia de ' + nome + ' no cart\u00e3o.'));
+      cc.appendChild(sec);
+      var sec2 = el('div', 'camada');
+      var cab2 = el('div', 'camada-cab'); cab2.appendChild(el('h3', null, 'O Centro Emocional da Crian\u00e7a')); cab2.appendChild(el('p', null, 'acolher as emo\u00e7\u00f5es do teu filho')); sec2.appendChild(cab2);
+      var e = f.emocional ? FAM.criEmo[f.emocional] : null;
+      if (e) sec2.appendChild(blocoLivre(e[0], null, [['A Chave', e[1], 'Fam\u00edlia']], nome + ' \u00b7 ' + e[0]));
+      else sec2.appendChild(el('p', 'falta', 'Escolhe o centro emocional de ' + nome + ' no cart\u00e3o.'));
+      cc.appendChild(sec2);
+    });
+
+    var bc = $('bebes-corpo'); bc.innerHTML = '';
+    if (!c.bebes.length) bc.appendChild(el('p', 'vazio', 'Junta um beb\u00e9 no cart\u00e3o, com o tipo de energia e os centros abertos, e o mapa dele aparece aqui.'));
+    c.bebes.forEach(function (b, i) {
+      var nome = b.nome || ('Beb\u00e9 ' + (i + 1));
+      bc.appendChild(el('h3', 'pessoa-tit', nome));
+      var sec = el('div', 'camada');
+      var cab = el('div', 'camada-cab'); cab.appendChild(el('h3', null, 'Sono (Rec\u00e9m-nascidos)')); cab.appendChild(el('p', null, 'como o teu beb\u00e9 descansa melhor')); sec.appendChild(cab);
+      var r = b.tipo ? FAM.bebSono[b.tipo] : null;
+      if (r) sec.appendChild(blocoLivre(r[0], r[1], [['Como Apoiar o Sono', r[2], 'Fam\u00edlia']], nome + ' \u00b7 ' + r[0]));
+      else sec.appendChild(el('p', 'falta', 'Escolhe o tipo de energia de ' + nome + ' no cart\u00e3o.'));
+      bc.appendChild(sec);
+      var sec2 = el('div', 'camada');
+      var cab2 = el('div', 'camada-cab'); cab2.appendChild(el('h3', null, 'Centros Indefinidos (Rec\u00e9m-nascidos)')); cab2.appendChild(el('p', null, 'onde o teu beb\u00e9 \u00e9 mais sens\u00edvel')); sec2.appendChild(cab2);
+      var abertos = Object.keys(FAM.bebCentro).filter(function (cn) { return b.abertos && b.abertos[cn]; });
+      abertos.forEach(function (cn) { var x = FAM.bebCentro[cn]; sec2.appendChild(blocoLivre(x[0] + ' \u00b7 aberto', x[1], [['Como o Apoiar', x[2], 'Fam\u00edlia']], nome + ' \u00b7 ' + x[0] + ' aberto')); });
+      if (!abertos.length) sec2.appendChild(el('p', 'falta', 'Marca no cart\u00e3o os centros abertos de ' + nome + '.'));
+      bc.appendChild(sec2);
+    });
+
+    var ci = $('ciclos-corpo'); ci.innerHTML = '';
+    if (op.lua) {
+      var hoje = faseDaLua(new Date());
+      var sl = el('div', 'camada');
+      var cl = el('div', 'camada-cab'); cl.appendChild(el('h3', null, 'Ciclos Lunares')); cl.appendChild(el('p', null, 'viver ao ritmo das fases da lua')); sl.appendChild(cl);
+      FAM.lua.forEach(function (r) {
+        var marca = r[0] === hoje ? el('span', 'lua-hoje', 'a lua de hoje') : null;
+        sl.appendChild(blocoLivre(r[0], r[1], [['Corpo', r[2], 'Corpo'], ['Fam\u00edlia', r[3], 'Fam\u00edlia'], ['Marca', r[4], 'Marca']], r[0], marca));
+      });
+      ci.appendChild(sl);
+      if (c.tipo === 'Refletora') {
+        var sr = el('div', 'camada');
+        var cr = el('div', 'camada-cab'); cr.appendChild(el('h3', null, 'O Ciclo Lunar da Refletora')); cr.appendChild(el('p', null, 'para ti, a lua \u00e9 a tua autoridade')); sr.appendChild(cr);
+        sr.appendChild(blocoLivre(FAM.luaRefletora[0], FAM.luaRefletora[1], [], 'Refletora'));
+        ci.appendChild(sr);
+      }
+    }
+    if (op.menstrual) {
+      var sm = el('div', 'camada');
+      var cm = el('div', 'camada-cab'); cm.appendChild(el('h3', null, 'Ciclo Menstrual')); cm.appendChild(el('p', null, 'viver ao ritmo das tuas esta\u00e7\u00f5es internas')); sm.appendChild(cm);
+      FAM.menstrual.forEach(function (r) { sm.appendChild(blocoLivre(r[0], r[1], [['Corpo', r[2], 'Corpo'], ['Fam\u00edlia', r[3], 'Fam\u00edlia'], ['Marca', r[4], 'Marca']], 'Fase ' + r[0])); });
+      ci.appendChild(sm);
+    }
+  }
+
+  [['o-filhos', 'filhos'], ['o-bebes', 'bebes'], ['o-lua', 'lua'], ['o-menstrual', 'menstrual']].forEach(function (p) {
+    $(p[0]).addEventListener('change', function (e) {
+      var c = cartao(); var op = opcoesDe(c); op[p[1]] = e.target.checked;
+      if (p[1] === 'filhos' && op.filhos && !c.filhos.length) c.filhos.push({ nome: '', tipo: '', emocional: '' });
+      if (p[1] === 'bebes' && op.bebes && !c.bebes.length) c.bebes.push({ nome: '', tipo: '', abertos: {} });
+      guardar(); pintarFamilia();
+    });
+  });
+  $('novo-filho').addEventListener('click', function () { cartao().filhos.push({ nome: '', tipo: '', emocional: '' }); guardar(); pintarFamilia(); });
+  $('novo-bebe').addEventListener('click', function () { cartao().bebes.push({ nome: '', tipo: '', abertos: {} }); guardar(); pintarFamilia(); });
+
+  pintarCartao();
+  pintarMapa();
+})();
+</script>
+
+</body>
+</html>
