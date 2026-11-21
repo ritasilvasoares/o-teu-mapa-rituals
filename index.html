@@ -161,6 +161,17 @@ details.dobra[open] summary::after { transform: rotate(45deg); }
 .gesto button { background: none; border: none; color: var(--suave); cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px; }
 .gesto button:hover { color: var(--bordo); }
 .momento .vazio-m { font-size: 14px; color: var(--suave); font-style: italic; padding: 8px 0 12px; }
+.cartao-pessoa { background: var(--papel); border: 1px solid var(--linha); border-radius: 18px; padding: 22px 20px 8px; display: flex; flex-direction: column; }
+.cartao-pessoa h3 { font-family: var(--serif); font-size: 32px; font-weight: 500; color: var(--fg); line-height: 1.1; }
+.cp-sub { font-size: 15px; color: var(--texto); margin-top: 4px; padding-bottom: 14px; }
+.cp-linha { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; padding: 12px 0; border-top: 1px solid var(--linha); }
+.cp-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.cp-rotulo { font-size: 12.5px; color: var(--suave); letter-spacing: .2px; }
+.cp-mes { font-style: normal; margin-left: 8px; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--bordo); }
+.cp-texto { font-size: 16px; color: var(--fg); line-height: 1.45; }
+.deste-mes .cp-texto { font-family: var(--serif); font-size: 20px; line-height: 1.3; }
+.cp-linha button { background: none; border: none; color: var(--suave); cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px; }
+.cp-linha button:hover { color: var(--bordo); }
 /* Os meus rituais em PDF */
 .pdf-bloco { background: var(--bordo); color: var(--sobre-bordo); padding: 26px 22px; display: flex; flex-direction: column; gap: 12px; }
 .pdf-bloco h3 { font-size: 28px; font-style: italic; font-weight: 400; }
@@ -654,28 +665,28 @@ html { scroll-behavior: smooth; }
   var CAMPOS = ['Corpo', 'Família', 'Marca'];
   var NOME_CAMPO = { 'Corpo': 'Corpo', 'Família': 'Projeto Família', 'Marca': 'Marca' };
   function rotinaDe(c) { if (!c.rotina) c.rotina = {}; return c.rotina; }
-  function aplicacoes(caixa, dado, corpo, familia, marca, perda) {
+  function aplicacoes(caixa, dado, corpo, familia, marca, perda, camada) {
     var c = cartao(); var rot = rotinaDe(c);
     var linhasA = [['Corpo', corpo, 'Corpo'], ['Família', familia, 'Família'], ['Marca', marca, 'Marca']];
     if (perda) linhasA.push(['Perda de Peso', perda, 'Corpo']);
     linhasA.forEach(function (a) {
       var l = el('div', 'aplic'); l.appendChild(el('b', null, a[0]));
       var txt = el('div', 'aplic-txt'); txt.appendChild(el('span', null, a[1]));
-      var id = dado + ' | ' + a[0];
+      var id = (camada === 'exercicio' ? 'Exerc\u00edcio \u00b7 ' : '') + dado + ' | ' + a[0];
       var m = el('div', 'momentos');
       var b = el('button', null, ''); b.type = 'button';
       function marcar(sim) { b.setAttribute('aria-pressed', sim ? 'true' : 'false'); b.textContent = sim ? '✓ Na minha rotina' : 'Escolho este gesto'; }
       marcar(!!rot[id]);
       b.addEventListener('click', function () {
         var r = rotinaDe(cartao());
-        if (r[id]) delete r[id]; else r[id] = { quando: Date.now(), texto: a[1], campo: a[2], dado: a[0] === 'Perda de Peso' ? dado + ' · Perda de Peso' : dado };
+        if (r[id]) delete r[id]; else r[id] = { quando: Date.now(), texto: a[1], campo: a[2], dado: a[0] === 'Perda de Peso' ? dado + ' · Perda de Peso' : dado, camada: camada, rotulo: a[0] };
         marcar(!!r[id]); guardar(); pintarRotina();
       });
       m.appendChild(b);
       txt.appendChild(m); l.appendChild(txt); caixa.appendChild(l);
     });
   }
-  function botaoGesto(id, texto, campo, dadoTxt) {
+  function botaoGesto(id, texto, campo, dadoTxt, camada, pessoa, rotulo) {
     var rot = rotinaDe(cartao());
     var m = el('div', 'momentos');
     var b = el('button', null, ''); b.type = 'button';
@@ -683,29 +694,29 @@ html { scroll-behavior: smooth; }
     marcar(!!rot[id]);
     b.addEventListener('click', function () {
       var r = rotinaDe(cartao());
-      if (r[id]) delete r[id]; else r[id] = { quando: Date.now(), texto: texto, campo: campo, dado: dadoTxt };
+      if (r[id]) delete r[id]; else r[id] = { quando: Date.now(), texto: texto, campo: campo, dado: dadoTxt, camada: camada, pessoa: pessoa, rotulo: rotulo };
       marcar(!!r[id]); guardar(); pintarRotina();
     });
     m.appendChild(b); return m;
   }
   /* bloco livre: linhas = [[r\u00f3tulo, texto, campo ou null]] */
-  function blocoLivre(dado, significado, linhas, idBase, extra) {
+  function blocoLivre(dado, significado, linhas, idBase, extra, camada, pessoa) {
     var caixa = el('div', 'linha-tua');
     var d = el('div', 'dado', dado); if (extra) d.appendChild(extra); caixa.appendChild(d);
     if (significado) caixa.appendChild(el('p', 'significado', significado));
     linhas.forEach(function (a) {
       var l = el('div', 'aplic'); l.appendChild(el('b', null, a[0]));
       var txt = el('div', 'aplic-txt'); txt.appendChild(el('span', null, a[1]));
-      if (a[2]) txt.appendChild(botaoGesto(idBase + ' | ' + a[0], a[1], a[2], idBase));
+      if (a[2]) txt.appendChild(botaoGesto(idBase + ' | ' + a[0], a[1], a[2], idBase, camada, pessoa, a[0]));
       l.appendChild(txt); caixa.appendChild(l);
     });
     return caixa;
   }
-  function blocoLinha(dado, linha) {
+  function blocoLinha(dado, linha, camada) {
     var caixa = el('div', 'linha-tua');
     caixa.appendChild(el('div', 'dado', dado));
     caixa.appendChild(el('p', 'significado', linha[0]));
-    aplicacoes(caixa, dado, linha[1], linha[2], linha[3], linha[4]);
+    aplicacoes(caixa, dado, linha[1], linha[2], linha[3], linha[4], camada);
     return caixa;
   }
   function idsPorCampo(rot, campo) {
@@ -717,25 +728,93 @@ html { scroll-behavior: smooth; }
     var txt = CAMPOS.map(function (campo) { return NOME_CAMPO[campo] + ' ' + idsPorCampo(rot, campo).length; }).join(' \u00b7 ');
     Array.prototype.forEach.call(document.querySelectorAll('.conta-gestos'), function (e) { e.textContent = 'Gestos escolhidos \u00b7 ' + txt; });
   }
+  /* ---------- OS GESTOS DE CADA PESSOA (ordem decidida pela Rita a 20-11) ---------- */
+  var ORDEM_GESTOS = ['tipo', 'assinatura', 'tema', 'emocoes', 'estrategia', 'autoridade', 'digestao', 'sentido', 'ambiente',
+    'vitTipo', 'vitAut', 'rotina', 'exercicio', 'manifestacao', 'CENTROS', 'perfil', 'crianca', 'bebe', 'lua', 'menstrual'];
+  var TITULO_GESTO = { CENTROS: 'Centros Energéticos', crianca: 'Crianças por Tipo', bebe: 'Recém-nascidos', lua: 'Ciclos Lunares', menstrual: 'Ciclo Menstrual' };
+  function tituloCamada(k) { return TITULO_GESTO[k] || (T[k] ? T[k].titulo.replace(/ \((Vitalidade)\)/, ' · vitalidade') : ''); }
+  function linhasDe(k) {
+    var t = T[k]; if (!t) return [];
+    if (t.multi) { var out = []; t.multi.forEach(function (par) { Object.keys(par[1]).forEach(function (kk) { out.push(par[1][kk][0]); }); }); return out; }
+    return Object.keys(t.linhas).map(function (kk) { return t.linhas[kk][0]; });
+  }
+  /* gestos guardados antes de 20-11 não sabem a camada nem a pessoa: descobre-as pelo texto */
+  function nomesFamilia(c) { opcoesDe(c); return c.filhos.map(function (f, i) { return [f.nome || ('Filho ' + (i + 1)), 'crianca']; }).concat(c.bebes.map(function (b, i) { return [b.nome || ('Bebé ' + (i + 1)), 'bebe']; })); }
+  function lerGesto(id, g, c) {
+    var camada = g.camada, pessoa = g.pessoa;
+    if (!camada) {
+      var base = String(g.dado || '').replace(' · Perda de Peso', '');
+      nomesFamilia(c).forEach(function (n) { if (!camada && base.indexOf(n[0] + ' · ') === 0) { camada = n[1]; pessoa = n[0]; } });
+      if (!camada && id.indexOf('Exercício · ') === 0) camada = 'exercicio';
+      if (!camada && C[base]) camada = 'CENTROS';
+      if (!camada && FAM.lua.some(function (r) { return r[0] === base; })) camada = 'lua';
+      if (!camada && base.indexOf('Fase ') === 0) camada = 'menstrual';
+      if (!camada) ORDEM_GESTOS.forEach(function (k) { if (!camada && linhasDe(k).indexOf(base) > -1) camada = k; });
+    }
+    var rotulo = g.rotulo || (id.split(' | ')[1] || '');
+    return { id: id, g: g, camada: camada || '', pessoa: pessoa || '', rotulo: rotulo };
+  }
+  /* devolve [{nome, sub, dono, gestos:[...]}], pela ordem: a dona do cartão aberto, depois os outros cartões, depois as crianças */
+  function gestosPorPessoa() {
+    var ordemCartoes = [estado.atual].concat(Object.keys(estado.pessoas).filter(function (k) { return k !== estado.atual; }));
+    var grupos = {}, lista = [];
+    function grupo(nome, sub) { var ch = nome.toLowerCase(); if (!grupos[ch]) { grupos[ch] = { nome: nome, sub: sub || '', gestos: [] }; lista.push(grupos[ch]); } else if (sub && !grupos[ch].sub) grupos[ch].sub = sub; return grupos[ch]; }
+    ordemCartoes.forEach(function (pid, i) {
+      var c = estado.pessoas[pid]; var rot = rotinaDe(c);
+      var dona = c.nome || (pid === estado.atual ? 'Eu' : 'Cartão ' + (i + 1));
+      var subDona = [c.tipo, c.perfil, c.autoridade].filter(Boolean).join(' · ');
+      if (Object.keys(rot).length) grupo(dona, subDona);
+      Object.keys(rot).forEach(function (id) {
+        var x = lerGesto(id, rot[id], c); x.dono = pid;
+        var nome = x.pessoa || dona; var sub = nome === dona ? subDona : '';
+        if (x.pessoa) nomesFamilia(c).forEach(function (n) { if (n[0] === x.pessoa) { var f = (n[1] === 'crianca' ? c.filhos : c.bebes).filter(function (q, j) { return (q.nome || '') === n[0] || (n[1] === 'crianca' ? 'Filho ' : 'Bebé ') + (j + 1) === n[0]; })[0]; if (f) sub = [f.tipo, f.emocional ? 'centro emocional ' + (f.emocional === 'Definido' ? 'definido' : 'aberto') : ''].filter(Boolean).join(' · '); } });
+        grupo(nome, sub).gestos.push(x);
+      });
+    });
+    lista.forEach(function (gr) {
+      gr.gestos.sort(function (a, b) {
+        var ra = ORDEM_GESTOS.indexOf(a.camada), rb = ORDEM_GESTOS.indexOf(b.camada);
+        if (ra < 0) ra = 99; if (rb < 0) rb = 99;
+        if (ra !== rb) return ra - rb;
+        var ca = CAMPOS.indexOf(a.g.campo), cb = CAMPOS.indexOf(b.g.campo);
+        if (ca !== cb) return ca - cb;
+        return (a.g.quando || 0) - (b.g.quando || 0);
+      });
+      /* os gestos deste mês: o primeiro de cada área, já pela ordem da pessoa */
+      var visto = {};
+      gr.gestos.forEach(function (x) { if (!visto[x.g.campo]) { visto[x.g.campo] = true; x.desteMes = true; } });
+    });
+    return lista.filter(function (gr) { return gr.gestos.length; });
+  }
+  function rotuloGesto(x) {
+    var t = tituloCamada(x.camada);
+    var area = x.rotulo && CAMPOS.indexOf(x.rotulo) < 0 && x.rotulo !== 'Família' ? x.rotulo : NOME_CAMPO[x.g.campo];
+    return [t, area].filter(Boolean).join(' · ');
+  }
   function pintarRotina() {
     pintarContador();
-    var c = cartao(); var rot = rotinaDe(c); var corpo = $('rotina-corpo'); corpo.innerHTML = '';
-    CAMPOS.forEach(function (campo) {
-      var bloco = el('div', 'momento');
-      bloco.appendChild(el('h3', null, NOME_CAMPO[campo]));
-      var ids = Object.keys(rot).filter(function (id) { return rot[id].campo === campo; });
-      if (!ids.length) bloco.appendChild(el('p', 'vazio-m', 'Ainda sem gestos. Escolhe-os nas camadas do mapa, na linha ' + campo + '.'));
-      ids.forEach(function (id) {
-        var g = rot[id]; var linha = el('div', 'gesto');
-        var p = el('p', null, g.texto); p.appendChild(el('small', null, g.dado)); linha.appendChild(p);
-        var x = el('button', null, '×'); x.type = 'button'; x.setAttribute('aria-label', 'Tirar da rotina: ' + g.texto);
-        x.addEventListener('click', function () {
-          delete rotinaDe(cartao())[id];
-          guardar(); pintarMapa();
-        });
-        linha.appendChild(x); bloco.appendChild(linha);
+    var corpo = $('rotina-corpo'); corpo.innerHTML = '';
+    var pessoas = gestosPorPessoa();
+    corpo.hidden = !pessoas.length;
+    if (pessoas.length) corpo.appendChild(el('h2', 'sec-titulo', pessoas.length > 1 ? 'Os nossos rituais' : 'Os meus rituais'));
+    pessoas.forEach(function (gr) {
+      var cartaoP = el('article', 'cartao-pessoa');
+      cartaoP.appendChild(el('h3', null, gr.nome));
+      if (gr.sub) cartaoP.appendChild(el('p', 'cp-sub', gr.sub));
+      gr.gestos.forEach(function (x) {
+        var linha = el('div', 'cp-linha' + (x.desteMes ? ' deste-mes' : ''));
+        var info = el('div', 'cp-info');
+        var r = el('span', 'cp-rotulo', rotuloGesto(x));
+        if (x.desteMes) r.appendChild(el('em', 'cp-mes', 'deste mês'));
+        info.appendChild(r);
+        info.appendChild(el('p', 'cp-texto', x.g.texto));
+        linha.appendChild(info);
+        var b = el('button', null, '×'); b.type = 'button'; b.setAttribute('aria-label', 'Tirar este gesto: ' + x.g.texto);
+        b.addEventListener('click', function () { delete rotinaDe(estado.pessoas[x.dono])[x.id]; guardar(); pintarMapa(); });
+        linha.appendChild(b);
+        cartaoP.appendChild(linha);
       });
-      corpo.appendChild(bloco);
+      corpo.appendChild(cartaoP);
     });
   }
   function outras(linhas, atual) {
@@ -776,7 +855,7 @@ html { scroll-behavior: smooth; }
         CENTROS.forEach(function (nome) {
           var v = c.centros[nome]; if (!v) return; algum = true;
           var chave = nome + ' · ' + v;
-          lista.appendChild(blocoLinha(chave, C[chave]));
+          lista.appendChild(blocoLinha(chave, C[chave], 'CENTROS'));
         });
         if (!algum) lista.appendChild(el('p', 'falta', 'Marca no cartão, para cada centro, se é definido ou aberto.'));
         else if (CENTROS.some(function (n) { return !c.centros[n]; })) lista.appendChild(el('p', 'falta', 'Faltam centros por marcar no cartão.'));
@@ -789,7 +868,7 @@ html { scroll-behavior: smooth; }
         var algumM = false; var todas = {};
         tab.multi.forEach(function (par) {
           var v = valorDe(c, par[0]); Object.keys(par[1]).forEach(function (kk) { todas[kk] = par[1][kk]; });
-          if (v && par[1][v]) { algumM = true; sec.appendChild(blocoLinha(par[1][v][0], par[1][v].slice(1))); }
+          if (v && par[1][v]) { algumM = true; sec.appendChild(blocoLinha(par[1][v][0], par[1][v].slice(1), k)); }
         });
         if (!algumM) sec.appendChild(el('p', 'falta', FALTA[k] || 'Preenche este dado no cartão.'));
         sec.appendChild(outras(todas, null));
@@ -798,7 +877,7 @@ html { scroll-behavior: smooth; }
       var valor = c[tab.chave];
       var linha = valor ? tab.linhas[valor] : null;
       if (linha) {
-        sec.appendChild(blocoLinha(linha[0], linha.slice(1)));
+        sec.appendChild(blocoLinha(linha[0], linha.slice(1), k));
       } else {
         var falta = { tipo: 'Escolhe o teu tipo de energia no cartão.', autoridade: 'Escolhe a tua autoridade no cartão.', perfil: 'Escolhe o teu perfil no cartão.', emocional: 'Escolhe o teu tipo emocional no cartão.' };
         sec.appendChild(el('p', 'falta', FALTA[k] || falta[tab.chave] || 'Preenche este dado no cartão.'));
@@ -908,39 +987,44 @@ html { scroll-behavior: smooth; }
     if (resumo) { doc.setFontSize(9.5); doc.text(limpo(resumo), W - M, 33, { align: 'right' }); }
     y = 60;
 
-    /* Os meus gestos deste mês: o primeiro escolhido em cada área, em grande */
-    var rot = rotinaDe(c); var destaque = {};
-    var primeiros = CAMPOS.map(function (campo) { var id = idsPorCampo(rot, campo)[0]; if (id) destaque[id] = true; return [campo, id]; }).filter(function (x) { return x[1]; });
-    if (primeiros.length) {
-      escrever('Os meus gestos deste mês', 'times', 'italic', 24, BORDO, 0, 4);
-      primeiros.forEach(function (x) {
-        var g = rot[x[1]];
-        cabe(18);
-        escrever(NOME_CAMPO[x[0]].toUpperCase(), 'helvetica', 'bold', 8.5, BORDO, 0, 3.5);
-        escrever(g.texto, 'times', 'italic', 16, [31, 20, 24], 0, 1);
-        escrever(g.dado, 'helvetica', 'normal', 8, SUAVE, 0, 5);
-      });
-      y += 2;
+    /* Os gestos, um cartão por pessoa, pela ordem decidida a 20-11 */
+    var pessoas = gestosPorPessoa();
+    if (pessoas.length) escrever(pessoas.length > 1 ? 'Os nossos rituais' : 'Os meus rituais', 'times', 'italic', 24, BORDO, 0, 5);
+    else escrever('Escolhe os teus gestos no guia, em "Escolho este gesto", e cria o PDF outra vez.', 'helvetica', 'italic', 9.5, SUAVE, 0, 3);
+    var P = 7, xi = M + P, li = larg - 2 * P, topoCartao = null;
+    function fecharCartao(fim) { doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.4); doc.roundedRect(M, topoCartao, larg, fim - topoCartao, 4, 4, 'S'); }
+    function linhasEm(txt, fonte, estilo, tam) { doc.setFont(fonte, estilo); doc.setFontSize(tam); return doc.splitTextToSize(limpo(txt), li); }
+    function pintarLinhas(ls, fonte, estilo, tam, cor, depois) {
+      doc.setFont(fonte, estilo); doc.setFontSize(tam); doc.setTextColor.apply(doc, cor);
+      ls.forEach(function (ln) { doc.text(ln, xi, y); y += tam * 0.42; }); y += depois;
     }
-
-    var outros = CAMPOS.map(function (campo) { return [campo, idsPorCampo(rot, campo).filter(function (id) { return !destaque[id]; })]; }).filter(function (x) { return x[1].length; });
-    if (outros.length) {
-      cabe(20); regua();
-      escrever('Os outros gestos', 'times', 'italic', 18, BORDO, 0, 3);
-      outros.forEach(function (x) {
-        cabe(12);
-        escrever(NOME_CAMPO[x[0]], 'times', 'bolditalic', 12, BORDO, 0, 1.2);
-        x[1].forEach(function (id) {
-          var g = rot[id];
-          cabe(8);
-          doc.setFillColor.apply(doc, BORDO); doc.circle(M + 1.2, y - 1.1, 0.6, 'F');
-          escrever(g.texto, 'helvetica', 'normal', 9, [31, 20, 24], 4, 0.4);
-          escrever(g.dado, 'helvetica', 'normal', 7, SUAVE, 4, 2);
-        });
-        y += 1.5;
-      });
+    /* se o bloco não cabe, fecha o cartão nesta página e continua-o na seguinte */
+    function reservar(h) {
+      if (y + h <= H - 20) return;
+      fecharCartao(y); rodape(); doc.addPage(); fundo(); y = M + 4; topoCartao = M; y += P - 2;
     }
-    if (!primeiros.length) escrever('Escolhe os teus gestos no guia, em "Escolho este gesto", e cria o PDF outra vez.', 'helvetica', 'italic', 9.5, SUAVE, 0, 3);
+    pessoas.forEach(function (gr, gi) {
+      var hNome = 12 + (gr.sub ? 7 : 0);
+      if (y + hNome + 22 > H - 20) { rodape(); doc.addPage(); fundo(); y = M; }
+      topoCartao = y; y += P + 6;
+      doc.setFont('times', 'normal'); doc.setFontSize(24); doc.setTextColor(31, 20, 24); doc.text(limpo(gr.nome), xi, y); y += 7;
+      if (gr.sub) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor.apply(doc, TEXTO); doc.text(limpo(gr.sub), xi, y); y += 6; }
+      y += 1;
+      gr.gestos.forEach(function (x) {
+        var rot = rotuloGesto(x);
+        var lt = x.desteMes ? linhasEm(x.g.texto, 'times', 'italic', 13.5) : linhasEm(x.g.texto, 'helvetica', 'normal', 10);
+        var hT = lt.length * (x.desteMes ? 13.5 : 10) * 0.42;
+        reservar(4 + 5 + hT + 3);
+        doc.setDrawColor.apply(doc, LINHA); doc.setLineWidth(0.25); doc.line(xi, y, M + larg - P, y); y += 5.5;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, SUAVE); doc.text(limpo(rot), xi, y);
+        if (x.desteMes) { var wr = doc.getTextWidth(limpo(rot)); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor.apply(doc, BORDO); doc.text('DESTE M' + String.fromCharCode(202) + 'S', xi + wr + 3, y); }
+        y += 5;
+        pintarLinhas(lt, x.desteMes ? 'times' : 'helvetica', x.desteMes ? 'italic' : 'normal', x.desteMes ? 13.5 : 10, [31, 20, 24], 1.5);
+      });
+      y += P - 3;
+      fecharCartao(y);
+      y += 8;
+    });
 
     /* O meu cartão */
     y += 2; if (y > 62) { cabe(20); regua(); }
@@ -1085,13 +1169,13 @@ html { scroll-behavior: smooth; }
       var sec = el('div', 'camada');
       var cab = el('div', 'camada-cab'); cab.appendChild(el('h3', null, 'Crian\u00e7as por Tipo')); cab.appendChild(el('p', null, 'como acompanhar o teu filho pelo desenho dele')); sec.appendChild(cab);
       var r = f.tipo ? FAM.criTipo[f.tipo] : null; var base = nome + ' \u00b7 ' + (f.tipo || '');
-      if (r) sec.appendChild(blocoLivre(r[0], r[1], [['A Chave', r[2], 'Fam\u00edlia'], ['Sono', r[3], 'Fam\u00edlia'], ['Comunica\u00e7\u00e3o e Ambiente', r[4], 'Fam\u00edlia']], base));
+      if (r) sec.appendChild(blocoLivre(r[0], r[1], [['A Chave', r[2], 'Fam\u00edlia'], ['Sono', r[3], 'Fam\u00edlia'], ['Comunica\u00e7\u00e3o e Ambiente', r[4], 'Fam\u00edlia']], base, null, 'crianca', nome));
       else sec.appendChild(el('p', 'falta', 'Escolhe o tipo de energia de ' + nome + ' no cart\u00e3o.'));
       cc.appendChild(sec);
       var sec2 = el('div', 'camada');
       var cab2 = el('div', 'camada-cab'); cab2.appendChild(el('h3', null, 'O Centro Emocional da Crian\u00e7a')); cab2.appendChild(el('p', null, 'acolher as emo\u00e7\u00f5es do teu filho')); sec2.appendChild(cab2);
       var e = f.emocional ? FAM.criEmo[f.emocional] : null;
-      if (e) sec2.appendChild(blocoLivre(e[0], null, [['A Chave', e[1], 'Fam\u00edlia']], nome + ' \u00b7 ' + e[0]));
+      if (e) sec2.appendChild(blocoLivre(e[0], null, [['A Chave', e[1], 'Fam\u00edlia']], nome + ' \u00b7 ' + e[0], null, 'crianca', nome));
       else sec2.appendChild(el('p', 'falta', 'Escolhe o centro emocional de ' + nome + ' no cart\u00e3o.'));
       cc.appendChild(sec2);
     });
@@ -1104,13 +1188,13 @@ html { scroll-behavior: smooth; }
       var sec = el('div', 'camada');
       var cab = el('div', 'camada-cab'); cab.appendChild(el('h3', null, 'Sono (Rec\u00e9m-nascidos)')); cab.appendChild(el('p', null, 'como o teu beb\u00e9 descansa melhor')); sec.appendChild(cab);
       var r = b.tipo ? FAM.bebSono[b.tipo] : null;
-      if (r) sec.appendChild(blocoLivre(r[0], r[1], [['Como Apoiar o Sono', r[2], 'Fam\u00edlia']], nome + ' \u00b7 ' + r[0]));
+      if (r) sec.appendChild(blocoLivre(r[0], r[1], [['Como Apoiar o Sono', r[2], 'Fam\u00edlia']], nome + ' \u00b7 ' + r[0], null, 'bebe', nome));
       else sec.appendChild(el('p', 'falta', 'Escolhe o tipo de energia de ' + nome + ' no cart\u00e3o.'));
       bc.appendChild(sec);
       var sec2 = el('div', 'camada');
       var cab2 = el('div', 'camada-cab'); cab2.appendChild(el('h3', null, 'Centros Indefinidos (Rec\u00e9m-nascidos)')); cab2.appendChild(el('p', null, 'onde o teu beb\u00e9 \u00e9 mais sens\u00edvel')); sec2.appendChild(cab2);
       var abertos = Object.keys(FAM.bebCentro).filter(function (cn) { return b.abertos && b.abertos[cn]; });
-      abertos.forEach(function (cn) { var x = FAM.bebCentro[cn]; sec2.appendChild(blocoLivre(x[0] + ' \u00b7 aberto', x[1], [['Como o Apoiar', x[2], 'Fam\u00edlia']], nome + ' \u00b7 ' + x[0] + ' aberto')); });
+      abertos.forEach(function (cn) { var x = FAM.bebCentro[cn]; sec2.appendChild(blocoLivre(x[0] + ' \u00b7 aberto', x[1], [['Como o Apoiar', x[2], 'Fam\u00edlia']], nome + ' \u00b7 ' + x[0] + ' aberto', null, 'bebe', nome)); });
       if (!abertos.length) sec2.appendChild(el('p', 'falta', 'Marca no cart\u00e3o os centros abertos de ' + nome + '.'));
       bc.appendChild(sec2);
     });
@@ -1122,7 +1206,7 @@ html { scroll-behavior: smooth; }
       var cl = el('div', 'camada-cab'); cl.appendChild(el('h3', null, 'Ciclos Lunares')); cl.appendChild(el('p', null, 'viver ao ritmo das fases da lua')); sl.appendChild(cl);
       FAM.lua.forEach(function (r) {
         var marca = r[0] === hoje ? el('span', 'lua-hoje', 'a lua de hoje') : null;
-        sl.appendChild(blocoLivre(r[0], r[1], [['Corpo', r[2], 'Corpo'], ['Fam\u00edlia', r[3], 'Fam\u00edlia'], ['Marca', r[4], 'Marca']], r[0], marca));
+        sl.appendChild(blocoLivre(r[0], r[1], [['Corpo', r[2], 'Corpo'], ['Fam\u00edlia', r[3], 'Fam\u00edlia'], ['Marca', r[4], 'Marca']], r[0], marca, 'lua'));
       });
       ci.appendChild(sl);
       if (c.tipo === 'Refletora') {
@@ -1135,7 +1219,7 @@ html { scroll-behavior: smooth; }
     if (op.menstrual) {
       var sm = el('div', 'camada');
       var cm = el('div', 'camada-cab'); cm.appendChild(el('h3', null, 'Ciclo Menstrual')); cm.appendChild(el('p', null, 'viver ao ritmo das tuas esta\u00e7\u00f5es internas')); sm.appendChild(cm);
-      FAM.menstrual.forEach(function (r) { sm.appendChild(blocoLivre(r[0], r[1], [['Corpo', r[2], 'Corpo'], ['Fam\u00edlia', r[3], 'Fam\u00edlia'], ['Marca', r[4], 'Marca']], 'Fase ' + r[0])); });
+      FAM.menstrual.forEach(function (r) { sm.appendChild(blocoLivre(r[0], r[1], [['Corpo', r[2], 'Corpo'], ['Fam\u00edlia', r[3], 'Fam\u00edlia'], ['Marca', r[4], 'Marca']], 'Fase ' + r[0], null, 'menstrual')); });
       ci.appendChild(sm);
     }
   }
